@@ -1,0 +1,28 @@
+{
+  "name": "bootstrap.purs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aratama/bootstrap.purs"
+  },
+  "scripts": {
+    "clean": "rimraf output .pulp-cache public/index.js",
+    "clean-all": "rimraf output .pulp-cache public/index.js bower_components node_modules",
+    "electron": "electron public",
+    "prebuild": "purs compile \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
+    "build": "purs bundle \"output/**/*.js\" --main Main --output public/index.js",
+    "prepack": "npm run build",
+    "pack": "electron-packager public cuica --platform=\"win32\" --arch=x64 --version=1.4.16 --overwrite --icon=./res/icon.ico --asar",
+    "postpack": "cd ./cuica-win32-x64/ && cuica",
+    "install": "cd public && npm install"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "electron": "^1.6.5",
+    "electron-packager": "^8.6.0"
+  }
+}

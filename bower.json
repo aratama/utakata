@@ -1,0 +1,24 @@
+{
+  "name": "bootstrap.purs",
+  "authors": [
+    "aratama <aratama@example.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-console": "^3.0.0",
+    "purescript-affjax": "^4.0.0",
+    "purescript-halogen": "^2.0.0",
+    "purescript-foreign": "^4.0.0",
+    "purescript-node-fs-aff": "^4.0.0"
+  }
+}
