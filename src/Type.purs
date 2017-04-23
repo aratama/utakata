@@ -1,6 +1,7 @@
 module Type where
 
-import Cuica.Audio (AudioContext)
+import Cuica.Audio (AudioBuffer, AudioContext, AudioBufferSource)
+import Data.Maybe (Maybe)
 import Data.Void (Void)
 import Halogen.Aff.Effects (HalogenEffects)
 import Network.HTTP.Affjax (AJAX)
@@ -11,12 +12,16 @@ import Node.Path (FilePath)
 type State = {
     context :: AudioContext,
     directory :: FilePath,
-    playing :: Boolean
+    buffer :: Maybe AudioBuffer,
+    source :: Maybe AudioBufferSource,
+    position :: Number
 }
 
 data Query a = OpenDirectory a
              | Play a
              | Pause a 
+             | Stop a
+             | Update a
 
 type Input = AudioContext
 

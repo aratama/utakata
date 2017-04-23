@@ -8,12 +8,15 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Exception (error)
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Except (runExcept)
+import Control.Monad.Rec.Class (tailRecM)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
 import Control.Plus ((<$))
-import Cuica.Audio (loadAudio, play, readMetadata)
+import Cuica.Audio (loadAudio, play, stop, readMetadata)
 import Cuica.File (home, openDirectory)
+import DOM.HTML.Window (requestAnimationFrame)
 import Data.Array (head)
+import Data.CommutativeRing ((+))
 import Data.Either (Either(..), either)
 import Data.Foreign (Foreign, readString)
 import Data.Foreign.Index (readProp)
@@ -21,6 +24,7 @@ import Data.Maybe (Maybe(..))
 import Data.Monoid ((<>))
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
+import Data.Traversable (for_)
 import Data.Unit (unit)
 import Halogen (Component)
 import Halogen.Component (ComponentDSL, component)
@@ -52,16 +56,52 @@ eval = case _ of
                     Just f -> do 
                         metadata <- liftAff $ readMetadata f
                         audio <- liftAff (loadAudio f state.context) 
-                        liftEff $ play audio state.context
-                        modify _ { directory = metadata.title }
+                        modify _ { 
+                            directory = metadata.title,
+                            buffer = Just audio 
+                        }
         pure next 
 
-    Play next -> do 
-        modify _ { playing = true }
+    Play next -> do
+        state <- get 
+        case state.buffer, state.source of 
+            Just buffer, Nothing -> do  
+                source <- liftEff $ play buffer state.context
+                modify _ { source = Just source }
+            _, _ -> pure unit 
+
         pure next 
 
     Pause next -> do 
-        modify _ { playing = false }    
+        state <- get 
+        case state.source of 
+            Just source -> do 
+                liftEff $ stop source
+                modify _ { 
+                    source = Nothing
+                }    
+            Nothing -> pure unit
+        pure next
+
+    Stop next -> do 
+        state <- get 
+        case state.source of 
+            Just source -> do 
+                liftEff $ stop source
+                modify _ { 
+                    source = Nothing
+                }    
+            Nothing -> pure unit
+        pure next
+
+    Update next -> do
+        state <- get 
+        case state.source of 
+            Just _ -> do  
+                modify _ {
+                    position = state.position + 0.01
+                }
+            Nothing -> pure unit
         pure next
 
 
@@ -69,6 +109,12 @@ ui :: forall eff. Component HTML Query Input Output (Aff (Effects eff))
 ui = component {
     render,
     eval,
-    initialState: \context -> { directory: home, playing: false, context },
+    initialState: \context -> { 
+        directory: home,
+        context,
+        buffer: Nothing,
+        source: Nothing,
+        position: 0.0
+    },
     receiver: \_ -> Nothing
 }

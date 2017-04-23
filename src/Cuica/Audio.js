@@ -31,7 +31,14 @@ exports.play = function(audioBuffer){
             source.buffer = audioBuffer;        
             source.connect(context.destination); 
             source.start(0);
+            return source;
         };
+    };
+};
+
+exports.stop = function(source){
+    return function(){
+        source.stop(0);
     };
 };
 
@@ -54,3 +61,10 @@ exports.readMetadataEff = function(path){
         };
     };
 };
+
+exports.currentTime = function(context){
+    return function(){
+        return context.currentTime;
+    };
+};
+

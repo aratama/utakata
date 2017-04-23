@@ -1,4 +1,4 @@
-module Cuica.Audio (AudioBuffer, AudioContext, Metadata, createAudioContext, loadAudio, play, readMetadata) where 
+module Cuica.Audio (AudioBuffer, AudioBufferSource, AudioContext, Metadata, createAudioContext, loadAudio, play, stop, readMetadata) where 
 
 import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Eff (Eff)
@@ -10,11 +10,15 @@ import Node.Path (FilePath)
 
 foreign import data AudioBuffer :: Type
 
+foreign import data AudioBufferSource :: Type
+
 foreign import data AudioContext :: Type
 
 foreign import createAudioContext :: forall eff. Eff (dom :: DOM | eff) AudioContext
 
-foreign import play :: forall eff. AudioBuffer -> AudioContext -> Eff (dom :: DOM | eff) Unit
+foreign import play :: forall eff. AudioBuffer -> AudioContext -> Eff (dom :: DOM | eff) AudioBufferSource
+
+foreign import stop :: forall eff. AudioBufferSource -> Eff (dom :: DOM | eff) Unit
  
 foreign import loadAudioEff :: forall eff. String -> AudioContext -> (Error -> Eff (dom :: DOM | eff) Unit) -> (AudioBuffer -> Eff (dom :: DOM | eff) Unit) -> Eff (dom :: DOM | eff) Unit
 
@@ -38,3 +42,6 @@ foreign import readMetadataEff :: forall eff. String -> (Error -> Eff (dom :: DO
 
 readMetadata :: forall eff. FilePath -> Aff (dom :: DOM | eff) Metadata
 readMetadata path = makeAff (readMetadataEff path)
+
+foreign import currentTime :: forall eff. Eff (dom :: DOM | eff) Number
+
