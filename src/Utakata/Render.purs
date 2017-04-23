@@ -3,11 +3,14 @@ module Utakata.Render (render) where
 import DOM.HTML.Indexed.StepValue (StepValue(..))
 import Data.Array (mapWithIndex)
 import Data.CommutativeRing ((+))
+import Data.Either (Either(..))
 import Data.Formatter.Number (format)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Monoid ((<>))
 import Data.Show (show)
+import Data.String.Regex (match, regex, test)
+import Data.String.Regex.Flags (noFlags)
 import Data.Unit (Unit, unit)
 import Data.Void (Void)
 import Halogen.HTML (HTML, text)
@@ -59,8 +62,10 @@ render state = div [] [
         value entry, 
         selected $ Just entry == (basename <$> state.filePath)
     ] [ 
-        --text $ formatInt (toNumber i) <> " " <> fromMaybe (basenameWithoutExt entry.path (extname entry.path)) entry.title
-        text $ formatInt (toNumber (i + 1)) <> " " <> basenameWithoutExt entry (extname entry)     
+        let name = basenameWithoutExt entry (extname entry) in 
+        case regex "^\\d+ " noFlags of 
+            Left err -> text "internal error" 
+            Right pattern -> text if test pattern name then name else formatInt (toNumber (i + 1)) <> " " <> name     
     ]
 
     formatInt i = format {
