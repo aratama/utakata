@@ -9,14 +9,14 @@ import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Void (Void)
 import Halogen.Aff.Effects (HalogenEffects)
-import Network.HTTP.Affjax (AJAX)
 import Node.FS.Aff (FS)
 import Node.Path (FilePath)
 
 type State = {
     context :: AudioContext,
+    playing :: Boolean,
     filePath :: Maybe FilePath, 
-    files :: Array { path :: FilePath, title :: Maybe String },
+    siblings :: Array FilePath,
     buffer :: Maybe AudioBuffer,
     source :: Maybe AudioBufferSource,
     position :: Number
@@ -33,6 +33,7 @@ data Query a = OpenFileDialog a
              | Stop a
              | Update a
              | Minimize a
+             | Move Int a 
              | Close a
 
 type Input = AudioContext
@@ -40,7 +41,6 @@ type Input = AudioContext
 type Output = Void
 
 type Effects eff = HalogenEffects (
-    ajax :: AJAX, 
     fs :: FS, 
     storage :: STORAGE "Utakata.Storage" Storage
         | eff)

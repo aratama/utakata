@@ -42,26 +42,6 @@ exports.stop = function(source){
     };
 };
 
-exports.readMetadataEff = function(path){
-    return function(reject){
-        return function(resolve){
-            return function(){
-                var fs = require('fs');
-                var mm = require('musicmetadata');
-                var readableStream = fs.createReadStream(path);
-                var parser = mm(readableStream, function (err, metadata) {
-                    if (err){ 
-                        reject(err)(); 
-                    }else{ 
-                        readableStream.close();
-                        resolve(metadata)(); 
-                    }
-                });
-            };
-        };
-    };
-};
-
 exports.currentTime = function(context){
     return function(){
         return context.currentTime;

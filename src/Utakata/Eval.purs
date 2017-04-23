@@ -1,45 +1,36 @@
-module Utakata.UI (ui) where
+module Utakata.Eval (eval) where
 
 import Control.Applicative (pure, when)
-import Control.Bind (bind, (>>=), discard)
+import Control.Bind (bind, discard)
 import Control.Monad.Aff (Aff, attempt)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Exception (error)
-import Control.Monad.Error.Class (throwError)
-import Control.Monad.Except (runExcept)
-import Control.Monad.Rec.Class (tailRecM)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
-import Control.Plus ((<$))
-import DOM.HTML.Window (requestAnimationFrame)
-import Data.Array (head, index, length, modifyAt, updateAt, (..))
+import DOM.HTML.Event.EventTypes (playing)
+import DOM.Node.Element (localName)
+import Data.Array (catMaybes, findIndex, head, index, length, modifyAt, (..))
+import Data.Boolean (otherwise)
 import Data.CommutativeRing ((+))
-import Data.Either (Either(..), either)
-import Data.Foreign (Foreign, readString)
-import Data.Foreign.Index (readProp)
+import Data.Either (Either(Right))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Maybe (Maybe(..), fromMaybe, isJust, maybe)
 import Data.Monoid ((<>))
 import Data.NaturalTransformation (type (~>))
-import Data.Show (show)
-import Data.Traversable (for_)
+import Data.Traversable (for, for_)
 import Data.Unit (unit)
-import Halogen (Component)
-import Halogen.Component (ComponentDSL, component)
-import Halogen.HTML.Core (HTML)
-import Network.HTTP.Affjax (get) as Ajax
+import Halogen.Component (ComponentDSL)
+import Halogen.Query (gets)
 import Node.FS.Aff (readdir)
 import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
-import Node.Path (basename, basenameWithoutExt, dirname, extname)
-import Prelude (($), (/=), (<$>), (>>=))
-import Utakata.Audio (loadAudio, play, stop, readMetadata)
+import Node.Path (basename, dirname, extname)
+import Prelude (negate, ($), (/=), (<$>), (<<<), (<=), (==))
+import Utakata.Audio (loadAudio, play, stop)
 import Utakata.Electron (close, minimize)
-import Utakata.File (home, openDirectory)
-import Utakata.LocalStorage (STORAGE, saveStorage)
-import Utakata.Render (render)
-import Utakata.Type (Input, Output, Query(..), State, Effects, Storage(..))
+import Utakata.File (openDirectory)
+import Utakata.LocalStorage (saveStorage)
+import Utakata.Type (Effects, Output, Query(..), State, Storage(Storage))
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval = case _ of
@@ -62,55 +53,65 @@ eval = case _ of
 
     Open filePath next -> do
 
-        --modify _ { title = "(Loading...)" }
         state <- get
-        let playing = isJust state.source
+        for_ state.source (liftEff <<< stop) 
 
-        eval (Stop unit)
-
-        let dir = dirname filePath
-        files <- liftAff $ readdir dir
-
-        -- load the audio file
-        metadataEither <- liftAff $ attempt $ readMetadata filePath
-        audio <- liftAff $ loadAudio filePath state.context
         modify _ { 
             filePath = Just filePath,
-            files = { path: _, title: Nothing } <$> files,
-            buffer = Just audio 
+            buffer = Nothing,
+            source = Nothing
         }
 
-        -- play current audio if playing 
-        when playing do 
-            eval (Play unit)
+        let dir = dirname filePath
+        entries <- liftAff $ readdir dir
 
-        -- get metadata of others and update audio file titles
-        for_ (0 .. length files) \i -> do 
-            s <- get
-            case index s.files i of 
-                Nothing -> pure unit 
-                Just fp -> do 
-                    met <- liftAff $ attempt $ readMetadata (dir <> "/" <> fp.path)
-                    let title' = case met of 
-                            Right m | m.title /= "" -> Just m.title
-                            _ -> Nothing 
-                    modify _ { 
-                        files = fromMaybe s.files $ modifyAt i (_ { title = title' }) s.files 
-                    }
+        files <- catMaybes <$> for entries \entry -> do 
+            s <- liftEff $ stat $ dir <> "/" <> entry
+            pure case extname entry of 
+                ".mp3" -> Just entry 
+                ".wave" -> Just entry 
+                ".ogg" -> Just entry  
+                _ -> Nothing  
 
+        -- load the audio file
+        audio <- liftAff $ loadAudio filePath state.context
+        currentAudioPath <- gets _.filePath
+        when (currentAudioPath == Just filePath) do
 
+            -- play current audio if playing 
+            playing <- gets _.playing
+            source <- if playing 
+                then liftEff $ Just <$> play audio state.context
+                else pure Nothing 
 
+            modify _ { 
+                siblings = files,
+                buffer = Just audio, 
+                source = source
+            }
 
         pure next 
 
 
+    Move delta next -> do 
+        state <- get  
+        fromMaybe (pure unit) do 
+            filePath <- state.filePath 
+            i <- findIndex (\x -> x == basename filePath) state.siblings
+            file <- index state.siblings (i + delta)
+            pure $ eval (Open (dirname filePath <> "/" <> file) unit)
+
+        pure next
 
     Play next -> do
         state <- get 
         case state.buffer, state.source of 
             Just buffer, Nothing -> do  
                 source <- liftEff $ play buffer state.context
-                modify _ { source = Just source }
+                modify _ { 
+                    playing = true,
+                    source = Just source 
+                }
             _, _ -> pure unit 
 
         pure next 
@@ -121,6 +122,7 @@ eval = case _ of
             Just source -> do 
                 liftEff $ stop source
                 modify _ { 
+                    playing = false,
                     source = Nothing
                 }    
             Nothing -> pure unit
@@ -132,6 +134,7 @@ eval = case _ of
             Just source -> do 
                 liftEff $ stop source
                 modify _ { 
+                    playing = false,
                     source = Nothing
                 }    
             Nothing -> pure unit
@@ -160,17 +163,3 @@ eval = case _ of
         pure next 
 
 
-ui :: forall eff. Component HTML Query Input Output (Aff (Effects eff))
-ui = component {
-    render,
-    eval,
-    initialState: \context -> { 
-        context,
-        filePath: Nothing,
-        files: [],
-        buffer: Nothing,
-        source: Nothing,
-        position: 0.0
-    },
-    receiver: \_ -> Nothing
-}

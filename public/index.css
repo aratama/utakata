@@ -102,6 +102,7 @@ select.audio-title {
     padding: 6px;
     color: white;
     text-align-last: center;
+    width: 100%;
 }
 
 select.audio-title option {

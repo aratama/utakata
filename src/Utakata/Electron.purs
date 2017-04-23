@@ -1,6 +1,5 @@
 module Utakata.Electron where 
 
-
 import Control.Monad.Eff (Eff)
 import DOM (DOM)
 import Data.Unit (Unit)
