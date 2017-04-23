@@ -8,13 +8,13 @@
   },
   "scripts": {
     "clean": "rimraf output .pulp-cache public/index.js",
-    "clean-all": "rimraf output .pulp-cache public/index.js bower_components node_modules public/node_modules cuica-win32-x64",
+    "clean-all": "rimraf output .pulp-cache public/index.js bower_components node_modules public/node_modules utakata-win32-x64",
     "electron": "electron public",
     "prebuild": "purs compile \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
     "build": "purs bundle \"output/**/*.js\" --main Main --output public/index.js",
     "prepack": "npm run build",
-    "pack": "electron-packager public cuica --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite --icon=./res/icon.ico --asar",
-    "postpack": "cd ./cuica-win32-x64/ && cuica",
+    "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite --icon=./res/icon.ico --asar",
+    "postpack": "cd ./utakata-win32-x64/ && utakata",
     "install": "cd public && npm install"
   },
   "author": "",

@@ -15,8 +15,8 @@ import Node.Path (FilePath)
 
 type State = {
     context :: AudioContext,
-    title :: String,
     filePath :: Maybe FilePath, 
+    files :: Array { path :: FilePath, title :: Maybe String },
     buffer :: Maybe AudioBuffer,
     source :: Maybe AudioBufferSource,
     position :: Number
@@ -32,6 +32,7 @@ data Query a = OpenFileDialog a
              | Pause a 
              | Stop a
              | Update a
+             | Minimize a
              | Close a
 
 type Input = AudioContext

@@ -47,10 +47,10 @@ input[type=range] {
 
 div.top-row {
     display: flex;
-    flex-direction: row-reverse;
+    justify-content: space-between;
 }
 
-button, input, .audio-title {
+button, input, select, option, .audio-title {
   -webkit-app-region: no-drag;
 }
 
@@ -81,6 +81,7 @@ button.close-button {
 div.file-row {
     font-size: 14px;
     display: flex;
+    
     align-items: center;
 }
 
@@ -90,14 +91,22 @@ div.top-row button.open {
     font-size: 9px;
 }
 
-.audio-title {
+select.audio-title {
     flex-grow: 1.0;
     text-align: center;
     background-color: rgba(0, 0, 0, 0.5);
     text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    border: none;
     border-radius: 2px;
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.3) inset;
     padding: 6px;
+    color: white;
+    text-align-last: center;
+}
+
+select.audio-title option {
+    text-align: center;
+    background-color: rgb(15, 89, 76);    
 }
 
 .audio-title::before {
@@ -115,3 +124,44 @@ div.controls button {
     width: 2em;
     height: 2em;
 }
+
+
+
+
+
+
+
+/* http://www.cssportal.com/style-input-range/ */
+input[type=range] {
+  -webkit-appearance: none;
+  margin: 10px 0;
+  width: 100%;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 0px 0px 0px #000000;
+  background: #204A40;
+  border-radius: 0px;
+  border: 0px solid #000000;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 0px 0px 0px #000000;
+  border: 0px solid #000000;
+  height: 15px;
+  width: 15px;
+  border-radius: 29px;
+  background: #FFFFFF;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -5.5px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #204A40;
+}
+

@@ -1,6 +1,6 @@
 module Utakata.UI (ui) where
 
-import Control.Applicative (pure)
+import Control.Applicative (pure, when)
 import Control.Bind (bind, (>>=), discard)
 import Control.Monad.Aff (Aff, attempt)
 import Control.Monad.Aff.Class (liftAff)
@@ -12,18 +12,14 @@ import Control.Monad.Rec.Class (tailRecM)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
 import Control.Plus ((<$))
-import Utakata.Audio (loadAudio, play, stop, readMetadata)
-import Utakata.Electron (close)
-import Utakata.File (home, openDirectory)
-import Utakata.LocalStorage (STORAGE, saveStorage)
 import DOM.HTML.Window (requestAnimationFrame)
-import Data.Array (head)
+import Data.Array (head, index, length, modifyAt, updateAt, (..))
 import Data.CommutativeRing ((+))
 import Data.Either (Either(..), either)
 import Data.Foreign (Foreign, readString)
 import Data.Foreign.Index (readProp)
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), fromMaybe, isJust, maybe)
 import Data.Monoid ((<>))
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
@@ -36,12 +32,18 @@ import Network.HTTP.Affjax (get) as Ajax
 import Node.FS.Aff (readdir)
 import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
-import Prelude (($), (<$>), (>>=))
+import Node.Path (basename, basenameWithoutExt, dirname, extname)
+import Prelude (($), (/=), (<$>), (>>=))
+import Utakata.Audio (loadAudio, play, stop, readMetadata)
+import Utakata.Electron (close, minimize)
+import Utakata.File (home, openDirectory)
+import Utakata.LocalStorage (STORAGE, saveStorage)
 import Utakata.Render (render)
 import Utakata.Type (Input, Output, Query(..), State, Effects, Storage(..))
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval = case _ of
+
     OpenFileDialog next -> do
         result <- openDirectory
         case result of 
@@ -58,17 +60,50 @@ eval = case _ of
                     Just f -> eval (Open f unit)
         pure next 
 
-    Open f next -> do
-        modify _ { title = "(Loading...)" }
+    Open filePath next -> do
+
+        --modify _ { title = "(Loading...)" }
         state <- get
-        metadata <- liftAff $ readMetadata f
-        audio <- liftAff (loadAudio f state.context) 
+        let playing = isJust state.source
+
+        eval (Stop unit)
+
+        let dir = dirname filePath
+        files <- liftAff $ readdir dir
+
+        -- load the audio file
+        metadataEither <- liftAff $ attempt $ readMetadata filePath
+        audio <- liftAff $ loadAudio filePath state.context
         modify _ { 
-            filePath = Just f,
-            title = metadata.title,
+            filePath = Just filePath,
+            files = { path: _, title: Nothing } <$> files,
             buffer = Just audio 
         }
+
+        -- play current audio if playing 
+        when playing do 
+            eval (Play unit)
+
+        -- get metadata of others and update audio file titles
+        for_ (0 .. length files) \i -> do 
+            s <- get
+            case index s.files i of 
+                Nothing -> pure unit 
+                Just fp -> do 
+                    met <- liftAff $ attempt $ readMetadata (dir <> "/" <> fp.path)
+                    let title' = case met of 
+                            Right m | m.title /= "" -> Just m.title
+                            _ -> Nothing 
+                    modify _ { 
+                        files = fromMaybe s.files $ modifyAt i (_ { title = title' }) s.files 
+                    }
+
+
+
+
         pure next 
+
+
 
     Play next -> do
         state <- get 
@@ -112,6 +147,10 @@ eval = case _ of
             Nothing -> pure unit
         pure next
 
+    Minimize next -> do 
+        liftEff minimize 
+        pure next
+
     Close next -> do 
         state <- get 
         liftEff $ saveStorage $ Storage {
@@ -126,9 +165,9 @@ ui = component {
     render,
     eval,
     initialState: \context -> { 
-        title: "",
         context,
         filePath: Nothing,
+        files: [],
         buffer: Nothing,
         source: Nothing,
         position: 0.0

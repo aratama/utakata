@@ -3,10 +3,11 @@
 Simple Audio Player.
 
 
-### build
+### launch
 
 ```
 npm install
 bower update
-npm run pack
+npm run build
+npm run electron
 ```
