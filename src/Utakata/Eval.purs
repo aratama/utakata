@@ -27,9 +27,8 @@ import Node.FS.Sync (stat)
 import Node.Path (basename, dirname, extname)
 import Prelude (negate, ($), (/=), (<$>), (<<<), (<=), (==))
 import Utakata.Audio (loadAudio, play, stop)
-import Utakata.Electron (close, minimize)
-import Utakata.File (openDirectory)
-import Utakata.LocalStorage (saveStorage)
+import Utakata.Electron (close, minimize, openDirectory)
+import Utakata.LocalStorage (saveStorage')
 import Utakata.Type (Effects, Output, Query(..), State, Storage(Storage))
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
@@ -156,7 +155,7 @@ eval = case _ of
 
     Close next -> do 
         state <- get 
-        liftEff $ saveStorage $ Storage {
+        liftEff $ saveStorage' $ Storage {
             filePath: NullOrUndefined state.filePath
         }
         liftEff close 

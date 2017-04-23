@@ -48,6 +48,7 @@ input[type=range] {
 div.top-row {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 6px;
 }
 
 button, input, select, option, .audio-title {
@@ -135,7 +136,7 @@ div.controls button {
 /* http://www.cssportal.com/style-input-range/ */
 input[type=range] {
   -webkit-appearance: none;
-  margin: 10px 0;
+  margin: 4px 0;
   width: 100%;
 }
 input[type=range]:focus {

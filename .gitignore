@@ -3,7 +3,7 @@ node_modules
 bower_components
 .psc-ide-port
 public/index.js
-cuica-win32-x64
+utakata-win32-x64
 
 # Windows image file caches
 Thumbs.db

@@ -22,9 +22,7 @@ type State = {
     position :: Number
 }
 
-newtype Storage = Storage {
-    filePath :: NullOrUndefined FilePath
-}
+
 
 data Query a = OpenFileDialog a
              | Open FilePath a
@@ -45,12 +43,11 @@ type Effects eff = HalogenEffects (
     storage :: STORAGE "Utakata.Storage" Storage
         | eff)
 
+
+newtype Storage = Storage {
+    filePath :: NullOrUndefined FilePath
+}
+
 derive instance genericStorage :: Generic Storage _
-
-instance decodeStorage :: Decode Storage where 
-    decode = genericDecode defaultOptions { unwrapSingleConstructors = true }
-
-instance encodeStorage :: Encode Storage where
-    encode = genericEncode defaultOptions { unwrapSingleConstructors = true }
 
 

@@ -22,7 +22,7 @@ import Halogen.Query (action)
 import Halogen.VDom.Driver (runUI)
 import Prelude (unit, ($))
 import Utakata.Audio (createAudioContext)
-import Utakata.LocalStorage (loadStorage)
+import Utakata.LocalStorage (loadStorage')
 import Utakata.Render (render)
 import Utakata.Type (Effects, Input, Query(Update, Open), Storage(Storage), Output)
 import Utakata.Eval (eval)
@@ -48,7 +48,8 @@ main :: forall eff. Eff (Effects eff) Unit
 main = runHalogenAff do
     body <- awaitBody
     context <- liftEff createAudioContext
-    options <- liftEff loadStorage
+    options <- liftEff loadStorage'
+    
     io <- runUI ui context body  
     case runExceptT options of 
         Identity (Right (Storage ops)) -> do 
