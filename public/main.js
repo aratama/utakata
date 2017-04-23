@@ -33,16 +33,6 @@ function createWindow() {
         slashes: true
     }))
 
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools();
-    electron.ipcMain.on("command", function(e, arg){
-        if(arg === "openDevTools"){
-            mainWindow.webContents.openDevTools();
-        }
-        console.log(arg);
-    });
-
-
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
         // Dereference the window object, usually you would store windows

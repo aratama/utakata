@@ -33,6 +33,7 @@ data Query a = OpenFileDialog a
              | Minimize a
              | Move Int a 
              | Close a
+             | OpenDevTools a
 
 type Input = AudioContext
 

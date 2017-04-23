@@ -1,4 +1,4 @@
-module Utakata.Electron (close, minimize, openDirectory, home) where 
+module Utakata.Electron (close, minimize, openDirectory, home, openDevTools) where 
 
 import Control.Apply ((<$>))
 import Control.Monad.Aff (makeAff)
@@ -19,5 +19,7 @@ foreign import openDirectoryEff :: forall eff. (Error -> Eff (dom :: DOM | eff) 
 
 openDirectory :: forall m eff. MonadAff (dom :: DOM | eff) m => m (Maybe FilePath)
 openDirectory = toMaybe <$> liftAff (makeAff openDirectoryEff)
+
+foreign import openDevTools :: forall eff. Eff (dom :: DOM | eff) Unit
 
 foreign import home :: FilePath

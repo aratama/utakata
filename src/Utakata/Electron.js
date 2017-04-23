@@ -26,4 +26,10 @@ exports.openDirectoryEff = function(reject){
     };
 };
 
+exports.openDevTools = function(){
+    var electron = require('electron');
+    var dialog = electron.remote.dialog;
+    electron.remote.getCurrentWindow().toggleDevTools();
+};
+
 exports.home = process.env.HOME;

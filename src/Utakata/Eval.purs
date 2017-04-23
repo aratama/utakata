@@ -27,7 +27,7 @@ import Node.FS.Sync (stat)
 import Node.Path (basename, dirname, extname)
 import Prelude (negate, ($), (/=), (<$>), (<<<), (<=), (==))
 import Utakata.Audio (loadAudio, play, stop)
-import Utakata.Electron (close, minimize, openDirectory)
+import Utakata.Electron (close, minimize, openDirectory, openDevTools)
 import Utakata.LocalStorage (saveStorage')
 import Utakata.Type (Effects, Output, Query(..), State, Storage(Storage))
 
@@ -162,3 +162,6 @@ eval = case _ of
         pure next 
 
 
+    OpenDevTools next -> do 
+        liftEff openDevTools
+        pure next 

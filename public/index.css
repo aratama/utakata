@@ -167,3 +167,22 @@ input[type=range]:focus::-webkit-slider-runnable-track {
   background: #204A40;
 }
 
+
+
+
+select {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+select::-webkit-scrollbar {
+  width: 5px;
+}
+ 
+select::-webkit-scrollbar-thumb {
+  background: #ddd; 
+}
+
+select::-webkit-scrollbar-track {
+  background: #666; 
+}

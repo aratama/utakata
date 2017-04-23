@@ -1,5 +1,6 @@
 module Utakata.Render (render) where
 
+import DOM.Event.KeyboardEvent (key)
 import DOM.HTML.Indexed.StepValue (StepValue(..))
 import Data.Array (mapWithIndex)
 import Data.CommutativeRing ((+))
@@ -16,7 +17,7 @@ import Data.Void (Void)
 import Halogen.HTML (HTML, text)
 import Halogen.HTML.Core (ClassName(..))
 import Halogen.HTML.Elements (button, div, i, input, option, select)
-import Halogen.HTML.Events (input_, onClick, onValueChange)
+import Halogen.HTML.Events (input_, onClick, onKeyDown, onValueChange)
 import Halogen.HTML.Properties (InputType(..), class_, max, min, selected, step, type_, value)
 import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
 import Prelude (negate, ($), (<$>), (==))
@@ -26,7 +27,11 @@ icon :: forall p i. String -> HTML p i
 icon name = i [class_ (ClassName ("fa fa-" <> name))] []
 
 render :: State -> HTML Void (Query Unit)
-render state = div [] [
+render state = div [
+    onKeyDown \e -> case key e of 
+        "d" -> Just (OpenDevTools unit)
+        _ -> Nothing 
+] [
     div [class_ (ClassName "top-row")] [
         button [class_ (ClassName "close-button"), onClick (input_ Minimize) ] [icon "window-minimize"],
         button [class_ (ClassName "close-button"), onClick (input_ Close) ] [icon "close"]    
