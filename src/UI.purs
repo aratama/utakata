@@ -36,6 +36,7 @@ import Node.FS.Sync (stat)
 import Prelude (($), (<$>), (>>=))
 import Render (render)
 import Type (Input, Output, Query(..), State, Effects)
+import Cuica.Electron (close)
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval = case _ of
@@ -57,7 +58,7 @@ eval = case _ of
                         metadata <- liftAff $ readMetadata f
                         audio <- liftAff (loadAudio f state.context) 
                         modify _ { 
-                            directory = metadata.title,
+                            title = metadata.title,
                             buffer = Just audio 
                         }
         pure next 
@@ -99,10 +100,14 @@ eval = case _ of
         case state.source of 
             Just _ -> do  
                 modify _ {
-                    position = state.position + 0.01
+                    position = state.position + 0.0002
                 }
             Nothing -> pure unit
         pure next
+
+    Close next -> do 
+        liftEff close 
+        pure next 
 
 
 ui :: forall eff. Component HTML Query Input Output (Aff (Effects eff))
@@ -110,7 +115,7 @@ ui = component {
     render,
     eval,
     initialState: \context -> { 
-        directory: home,
+        title: "",
         context,
         buffer: Nothing,
         source: Nothing,

@@ -21,6 +21,8 @@ function createWindow() {
         center: true,
         resizable: false,
         fullscreenable: true,
+        frame: false,
+        transparent: true,
         icon: __dirname + "/icon.png"
     })
 

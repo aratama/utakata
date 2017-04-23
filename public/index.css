@@ -1,3 +1,9 @@
+* {
+    box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+}
+
 button {
     background-color: transparent;
     margin: 10px;
@@ -6,6 +12,85 @@ button {
     letter-spacing: 0.1em;
 }
 
-body {
+
+
+html, body {
     overflow: hidden;
+    border-radius: 5px;
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+}
+
+html {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+
+body {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px;
+}
+
+button {
+    color: white;
+}
+
+input[type=range] {
+    width: 100%;
+}
+
+div.top-row {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+button, input {
+  -webkit-app-region: no-drag;
+}
+
+button {
+    border: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition-property: all;
+    transition-duration: 0.15s;
+    margin: 4px;
+    padding: 4px;
+}
+
+button:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+button.close-button {
+    width: 16px;
+    height: 16px;
+    font-size: 8px;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+
+div.file-row {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+div.top-row button.open {
+    height: 9px;
+    width: 9px;
+    font-size: 9px;
+}
+
+span.audio-title {
+    flex-grow: 1.0;
+    text-align: center;
+}
+
+div.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

@@ -11,7 +11,7 @@ import Node.Path (FilePath)
 
 type State = {
     context :: AudioContext,
-    directory :: FilePath,
+    title :: String,
     buffer :: Maybe AudioBuffer,
     source :: Maybe AudioBufferSource,
     position :: Number
@@ -22,6 +22,7 @@ data Query a = OpenDirectory a
              | Pause a 
              | Stop a
              | Update a
+             | Close a
 
 type Input = AudioContext
 

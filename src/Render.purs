@@ -1,6 +1,7 @@
 module Render where
 
 import DOM.HTML.Indexed.InputType (InputType(..))
+import DOM.HTML.Indexed.StepValue (StepValue(..))
 import Data.Maybe (Maybe(..))
 import Data.Monoid ((<>))
 import Data.Show (show)
@@ -8,9 +9,9 @@ import Data.Unit (Unit)
 import Data.Void (Void)
 import Halogen.HTML (HTML, text)
 import Halogen.HTML.Core (ClassName(..))
-import Halogen.HTML.Elements (button, div, i, input)
+import Halogen.HTML.Elements (button, div, i, input, span)
 import Halogen.HTML.Events (input_, onClick)
-import Halogen.HTML.Properties (InputType(..), class_, type_, value)
+import Halogen.HTML.Properties (InputType(..), class_, max, min, step, type_, value)
 import Type (Query(..), State)
 
 
@@ -19,9 +20,14 @@ icon name = i [class_ (ClassName ("fa fa-" <> name))] []
 
 render :: State -> HTML Void (Query Unit)
 render state = div [] [
-    button [ onClick (input_ OpenDirectory) ] [icon "folder-open"],
-    text state.directory,
-    div [] [
+    div [class_ (ClassName "top-row")] [
+        button [class_ (ClassName "close-button"), onClick (input_ Close) ] [icon "close"]    
+    ], 
+    div [class_ (ClassName "file-row")] [
+        span [class_ (ClassName "audio-title")] [text state.title],
+        button [class_ (ClassName "open"), onClick (input_ OpenDirectory) ] [icon "folder-open"]
+    ],
+    div [class_ (ClassName "controls")] [
         button [ onClick (input_ OpenDirectory) ] [icon "backward"],
         case state.source of 
             Nothing -> button [ onClick (input_ Play) ] [icon "play"]
@@ -30,6 +36,6 @@ render state = div [] [
         button [ onClick (input_ OpenDirectory) ] [icon "forward"]
     ], 
     div [] [
-        input [type_ InputRange, value (show state.position)]
+        input [type_ InputRange, min 0.0, max 1.0, step (Step 0.001), value (show state.position)]
     ]
 ]
