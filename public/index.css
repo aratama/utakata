@@ -22,7 +22,7 @@ button {
 
 html, body {
     overflow: hidden;
-    border-radius: 5px;
+    border-radius: 3px;
     -webkit-app-region: drag;
     -webkit-user-select: none;
 }
@@ -50,7 +50,7 @@ div.top-row {
     flex-direction: row-reverse;
 }
 
-button, input {
+button, input, .audio-title {
   -webkit-app-region: no-drag;
 }
 
@@ -95,6 +95,9 @@ div.top-row button.open {
     text-align: center;
     background-color: rgba(0, 0, 0, 0.5);
     text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 2px;
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.3) inset;
+    padding: 6px;
 }
 
 .audio-title::before {
@@ -105,4 +108,10 @@ div.controls {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 4px;
+}
+
+div.controls button {
+    width: 2em;
+    height: 2em;
 }

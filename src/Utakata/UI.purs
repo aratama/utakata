@@ -1,4 +1,4 @@
-module UI (ui) where
+module Utakata.UI (ui) where
 
 import Control.Applicative (pure)
 import Control.Bind (bind, (>>=), discard)
@@ -12,10 +12,10 @@ import Control.Monad.Rec.Class (tailRecM)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
 import Control.Plus ((<$))
-import Cuica.Audio (loadAudio, play, stop, readMetadata)
-import Cuica.Electron (close)
-import Cuica.File (home, openDirectory)
-import Cuica.LocalStorage (STORAGE, saveStorage)
+import Utakata.Audio (loadAudio, play, stop, readMetadata)
+import Utakata.Electron (close)
+import Utakata.File (home, openDirectory)
+import Utakata.LocalStorage (STORAGE, saveStorage)
 import DOM.HTML.Window (requestAnimationFrame)
 import Data.Array (head)
 import Data.CommutativeRing ((+))
@@ -37,8 +37,8 @@ import Node.FS.Aff (readdir)
 import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
 import Prelude (($), (<$>), (>>=))
-import Render (render)
-import Type (Input, Output, Query(..), State, Effects, Storage(..))
+import Utakata.Render (render)
+import Utakata.Type (Input, Output, Query(..), State, Effects, Storage(..))
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval = case _ of

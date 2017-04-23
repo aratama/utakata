@@ -1,11 +1,10 @@
 {
-  "name": "bootstrap.purs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "utakata",
+  "version": "0.1.0",
+  "description": "Simple Audio Player",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aratama/bootstrap.purs"
+    "url": "https://github.com/aratama/utakata"
   },
   "scripts": {
     "clean": "rimraf output .pulp-cache public/index.js",

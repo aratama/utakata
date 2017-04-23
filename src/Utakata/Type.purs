@@ -1,10 +1,10 @@
-module Type where
+module Utakata.Type where
 
-import Cuica.Audio (AudioBuffer, AudioContext, AudioBufferSource)
-import Cuica.LocalStorage (STORAGE)
+import Utakata.Audio (AudioBuffer, AudioContext, AudioBufferSource)
+import Utakata.LocalStorage (STORAGE)
 import Data.Foreign.Class (class Decode, class Encode)
 import Data.Foreign.Generic (defaultOptions, genericDecode, genericEncode)
-import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
+import Data.Foreign.NullOrUndefined (NullOrUndefined)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe)
 import Data.Void (Void)
@@ -12,7 +12,6 @@ import Halogen.Aff.Effects (HalogenEffects)
 import Network.HTTP.Affjax (AJAX)
 import Node.FS.Aff (FS)
 import Node.Path (FilePath)
-
 
 type State = {
     context :: AudioContext,
@@ -42,7 +41,7 @@ type Output = Void
 type Effects eff = HalogenEffects (
     ajax :: AJAX, 
     fs :: FS, 
-    storage :: STORAGE "Cuica.Storage" Storage
+    storage :: STORAGE "Utakata.Storage" Storage
         | eff)
 
 derive instance genericStorage :: Generic Storage _

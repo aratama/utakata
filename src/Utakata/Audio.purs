@@ -1,4 +1,4 @@
-module Cuica.Audio (AudioBuffer, AudioBufferSource, AudioContext, Metadata, createAudioContext, loadAudio, play, stop, readMetadata) where 
+module Utakata.Audio (AudioBuffer, AudioBufferSource, AudioContext, Metadata, createAudioContext, loadAudio, play, stop, readMetadata) where 
 
 import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Eff (Eff)

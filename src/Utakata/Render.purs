@@ -1,4 +1,4 @@
-module Render where
+module Utakata.Render where
 
 import DOM.HTML.Indexed.StepValue (StepValue(..))
 import Data.Maybe (Maybe(..))
@@ -11,8 +11,7 @@ import Halogen.HTML.Core (ClassName(..))
 import Halogen.HTML.Elements (button, div, i, input)
 import Halogen.HTML.Events (input_, onClick)
 import Halogen.HTML.Properties (InputType(..), class_, max, min, step, type_, value)
-import Type (Query(..), State)
-
+import Utakata.Type (Query(..), State)
 
 icon :: forall p i. String -> HTML p i
 icon name = i [class_ (ClassName ("fa fa-" <> name))] []

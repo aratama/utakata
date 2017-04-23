@@ -1,5 +1,9 @@
-# Ohkami
+# Utakata
 
+Simple Audio Player.
+
+
+### build
 
 ```
 npm install

@@ -1,4 +1,4 @@
-module Cuica.RequestAnimationFrame where 
+module Utakata.RequestAnimationFrame where 
 
 import Control.Monad.Eff (Eff)
 import DOM (DOM)

@@ -1,4 +1,4 @@
-module Cuica.File (openDirectory, home) where 
+module Utakata.File (openDirectory, home) where 
 
 
 import Control.Apply ((<$>))

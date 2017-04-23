@@ -1,4 +1,4 @@
-module Cuica.Electron where 
+module Utakata.Electron where 
 
 
 import Control.Monad.Eff (Eff)
