@@ -13,13 +13,16 @@ import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
 import Control.Plus ((<$))
 import Cuica.Audio (loadAudio, play, stop, readMetadata)
+import Cuica.Electron (close)
 import Cuica.File (home, openDirectory)
+import Cuica.LocalStorage (STORAGE, saveStorage)
 import DOM.HTML.Window (requestAnimationFrame)
 import Data.Array (head)
 import Data.CommutativeRing ((+))
 import Data.Either (Either(..), either)
 import Data.Foreign (Foreign, readString)
 import Data.Foreign.Index (readProp)
+import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Maybe (Maybe(..))
 import Data.Monoid ((<>))
 import Data.NaturalTransformation (type (~>))
@@ -35,13 +38,11 @@ import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
 import Prelude (($), (<$>), (>>=))
 import Render (render)
-import Type (Input, Output, Query(..), State, Effects)
-import Cuica.Electron (close)
+import Type (Input, Output, Query(..), State, Effects, Storage(..))
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval = case _ of
-    OpenDirectory next -> do
-        state <- get
+    OpenFileDialog next -> do
         result <- openDirectory
         case result of 
             Nothing -> pure unit 
@@ -54,13 +55,19 @@ eval = case _ of
                         pure $ (\p -> dirOrFile <> "/" <> p) <$> head files 
                 case file of 
                     Nothing -> pure unit 
-                    Just f -> do 
-                        metadata <- liftAff $ readMetadata f
-                        audio <- liftAff (loadAudio f state.context) 
-                        modify _ { 
-                            title = metadata.title,
-                            buffer = Just audio 
-                        }
+                    Just f -> eval (Open f unit)
+        pure next 
+
+    Open f next -> do
+        modify _ { title = "(Loading...)" }
+        state <- get
+        metadata <- liftAff $ readMetadata f
+        audio <- liftAff (loadAudio f state.context) 
+        modify _ { 
+            filePath = Just f,
+            title = metadata.title,
+            buffer = Just audio 
+        }
         pure next 
 
     Play next -> do
@@ -106,6 +113,10 @@ eval = case _ of
         pure next
 
     Close next -> do 
+        state <- get 
+        liftEff $ saveStorage $ Storage {
+            filePath: NullOrUndefined state.filePath
+        }
         liftEff close 
         pure next 
 
@@ -117,6 +128,7 @@ ui = component {
     initialState: \context -> { 
         title: "",
         context,
+        filePath: Nothing,
         buffer: Nothing,
         source: Nothing,
         position: 0.0

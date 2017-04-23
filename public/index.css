@@ -1,7 +1,13 @@
+@font-face {
+    font-family: "ranobepop";
+    src: url("ranobepop.otf");
+}
+
 * {
     box-sizing: border-box;
     padding: 0px;
     margin: 0px;
+    font-family: "ranobepop";
 }
 
 button {
@@ -26,7 +32,7 @@ html {
 }
 
 body {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgb(30, 170, 157);
     color: white;
     padding: 8px;
 }
@@ -84,9 +90,15 @@ div.top-row button.open {
     font-size: 9px;
 }
 
-span.audio-title {
+.audio-title {
     flex-grow: 1.0;
     text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+.audio-title::before {
+    content: "\00a0";
 }
 
 div.controls {
