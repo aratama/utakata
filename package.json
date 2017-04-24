@@ -15,6 +15,8 @@
     "build": "purs bundle \"output/**/*.js\" --module Main --main Main --output public/index.js",
     "prepack": "npm run build",
     "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite --icon=./res/icon.ico --asar",
+    "prepack-all": "npm run build",    
+    "pack-all": "electron-packager public utakata --all --electron-version=1.4.16 --overwrite --icon=./res/icon.ico --asar",    
     "postpack": "cd ./utakata-win32-x64/ && utakata",
     "install": "cd public && npm install"
   },

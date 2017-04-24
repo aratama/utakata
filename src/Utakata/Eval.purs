@@ -2,10 +2,11 @@ module Utakata.Eval (eval) where
 
 import Control.Applicative (pure, when)
 import Control.Bind (bind, discard)
-import Control.Monad.Aff (Aff)
+import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (log)
+import Control.Monad.Fork.Class (fork)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
 import Data.Array (catMaybes, findIndex, head, index)
@@ -28,7 +29,7 @@ import Prelude (($), (*), (<$>), (<<<), (==))
 import Utakata.Audio (loadAudio, play, stop, setGain, addEndEventListener)
 import Utakata.Electron (close, minimize, openDirectory, openDevTools)
 import Utakata.LocalStorage (saveStorage')
-import Utakata.Type (Effects, Output, Query(..), State, Storage(Storage))
+import Utakata.Type (Effects, Mode(..), Output, Query(..), State, Storage(Storage))
 
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
@@ -107,11 +108,11 @@ eval = case _ of
         state <- get 
         case state.buffer, state.source of 
             Just buffer, Nothing -> do  
-                source <- liftEff $ play buffer state.context 
-                subscribe $ eventSource (addEndEventListener source) (\e -> Just (End Done))
+                graph <- liftEff $ play buffer state.context 
+                subscribe $ eventSource (addEndEventListener graph.source) (\e -> Just (End Done))
                 modify _ { 
                     playing = true,
-                    source = Just source 
+                    source = Just graph 
                 }
                 pure unit 
 
@@ -119,8 +120,13 @@ eval = case _ of
 
         pure next 
 
-    End next -> do  
-        liftEff $ log "end"
+    End next -> do
+        state <- get 
+        case state.mode of 
+            RepeatOff -> eval (Stop unit) 
+            RepeatOne -> eval (Move 0 unit)
+            RepeatAll -> eval (Move 1 unit)
+            Random -> eval (Move 1 unit)
         pure next 
 
     Pause next -> do 

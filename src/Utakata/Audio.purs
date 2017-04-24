@@ -26,7 +26,7 @@ foreign import createAudioContext :: forall eff. Eff (dom :: DOM | eff) AudioCon
 
 foreign import play :: forall eff. AudioBuffer -> AudioContext -> Eff (dom :: DOM | eff) AudioGraph
 
-foreign import addEndEventListener :: forall eff. AudioGraph -> (Event -> Eff (dom :: DOM, avar :: AVAR | eff) Unit) -> Eff (dom :: DOM, avar :: AVAR | eff) Unit
+foreign import addEndEventListener :: forall eff. AudioBufferSource -> (Event -> Eff (dom :: DOM, avar :: AVAR | eff) Unit) -> Eff (dom :: DOM, avar :: AVAR | eff) Unit
 
 foreign import stop :: forall eff. AudioGraph -> Eff (dom :: DOM | eff) Unit
 

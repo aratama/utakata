@@ -4,6 +4,10 @@ bower_components
 .psc-ide-port
 public/index.js
 utakata-win32-x64
+utakata-win32-ia32
+utakata-linux-x64
+utakata-linux-ia32
+utakata-linux-armv7l
 
 # Windows image file caches
 Thumbs.db

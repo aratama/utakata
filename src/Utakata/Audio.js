@@ -40,10 +40,10 @@ exports.play = function(audioBuffer){
     };
 };
 
-exports.addEndEventListener = function(graph){
+exports.addEndEventListener = function(source){
      return function(onEnd){
         return function(){
-            graph.source.onended = function(e){
+            source.onended = function(e){
                 onEnd({})();
             };
         };
