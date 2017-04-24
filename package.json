@@ -7,8 +7,9 @@
     "url": "https://github.com/aratama/utakata"
   },
   "scripts": {
-    "clean": "rimraf output .pulp-cache public/index.js",
+    "clean": "rimraf output .pulp-cache public/index.js utakata-win32-x64",
     "clean-all": "rimraf output .pulp-cache public/index.js bower_components node_modules public/node_modules utakata-win32-x64",
+    "preelectron": "npm run build",
     "electron": "electron public",
     "prebuild": "purs compile \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
     "build": "purs bundle \"output/**/*.js\" --module Main --main Main --output public/index.js",

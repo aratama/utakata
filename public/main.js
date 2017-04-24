@@ -14,7 +14,7 @@ let mainWindow
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        title: "Cuica",
+        title: "Utakata",
         width: 400,
         height: 160,
         useContentSize: true,

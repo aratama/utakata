@@ -2,34 +2,34 @@ module Utakata.Eval (eval) where
 
 import Control.Applicative (pure, when)
 import Control.Bind (bind, discard)
-import Control.Monad.Aff (Aff, attempt)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
+import Control.Monad.Eff.Console (log)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
-import DOM.HTML.Event.EventTypes (playing)
-import DOM.Node.Element (localName)
-import Data.Array (catMaybes, findIndex, head, index, length, modifyAt, (..))
-import Data.Boolean (otherwise)
+import Data.Array (catMaybes, findIndex, head, index)
 import Data.CommutativeRing ((+))
-import Data.Either (Either(Right))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
-import Data.Maybe (Maybe(..), fromMaybe, isJust, maybe)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Monoid ((<>))
 import Data.NaturalTransformation (type (~>))
 import Data.Traversable (for, for_)
 import Data.Unit (unit)
 import Halogen.Component (ComponentDSL)
 import Halogen.Query (gets)
+import Halogen.Query.EventSource (SubscribeStatus(..), eventSource)
+import Halogen.Query.HalogenM (subscribe)
 import Node.FS.Aff (readdir)
 import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
 import Node.Path (basename, dirname, extname)
-import Prelude (negate, ($), (/=), (<$>), (<<<), (<=), (==))
-import Utakata.Audio (loadAudio, play, stop)
+import Prelude (($), (*), (<$>), (<<<), (==))
+import Utakata.Audio (loadAudio, play, stop, setGain, addEndEventListener)
 import Utakata.Electron (close, minimize, openDirectory, openDevTools)
 import Utakata.LocalStorage (saveStorage')
 import Utakata.Type (Effects, Output, Query(..), State, Storage(Storage))
+
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval = case _ of
@@ -79,6 +79,7 @@ eval = case _ of
 
             -- play current audio if playing 
             playing <- gets _.playing
+            updateGain
             source <- if playing 
                 then liftEff $ Just <$> play audio state.context
                 else pure Nothing 
@@ -106,13 +107,20 @@ eval = case _ of
         state <- get 
         case state.buffer, state.source of 
             Just buffer, Nothing -> do  
-                source <- liftEff $ play buffer state.context
+                source <- liftEff $ play buffer state.context 
+                subscribe $ eventSource (addEndEventListener source) (\e -> Just (End Done))
                 modify _ { 
                     playing = true,
                     source = Just source 
                 }
+                pure unit 
+
             _, _ -> pure unit 
 
+        pure next 
+
+    End next -> do  
+        liftEff $ log "end"
         pure next 
 
     Pause next -> do 
@@ -165,3 +173,23 @@ eval = case _ of
     OpenDevTools next -> do 
         liftEff openDevTools
         pure next 
+
+    SetMode mode next -> do 
+        modify _ { mode = mode }
+        pure next 
+
+    SetMute mute next -> do 
+        modify _ { muted = mute }
+        updateGain
+        pure next 
+    
+    SetVolume value next -> do 
+        modify _ { volume = value }
+        updateGain 
+        pure next 
+
+  where 
+    updateGain = do 
+        state <- get 
+        liftEff $ for_ state.source $ setGain if state.muted then 0.0 else state.volume * state.volume  
+

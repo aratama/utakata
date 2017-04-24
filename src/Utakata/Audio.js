@@ -27,18 +27,32 @@ exports.loadAudioEff = function(path){
 exports.play = function(audioBuffer){
     return function(context){
         return function(){
+            var gain = context.createGain();
+            gain.connect(context.destination);
+
             var source = context.createBufferSource();
             source.buffer = audioBuffer;        
-            source.connect(context.destination); 
+            source.connect(gain); 
             source.start(0);
-            return source;
+
+            return { source: source, gain: gain };
         };
     };
 };
 
-exports.stop = function(source){
+exports.addEndEventListener = function(graph){
+     return function(onEnd){
+        return function(){
+            graph.source.onended = function(e){
+                onEnd({})();
+            };
+        };
+    };
+};
+
+exports.stop = function(graph){
     return function(){
-        source.stop(0);
+        graph.source.stop(0);
     };
 };
 
@@ -48,3 +62,12 @@ exports.currentTime = function(context){
     };
 };
 
+exports.setGain = function(value){
+    return function(graph){
+        graph.gain.gain.value = value;
+    };
+};
+
+exports.getDuration = function(buffer){
+    return buffer.duration;
+};

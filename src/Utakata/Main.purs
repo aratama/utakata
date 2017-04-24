@@ -14,18 +14,17 @@ import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Identity (Identity(..))
 import Data.Maybe (Maybe(..))
 import Data.Unit (Unit)
-import Halogen (Component)
 import Halogen.Aff.Util (runHalogenAff, awaitBody)
-import Halogen.Component (component)
-import Halogen.HTML (HTML(..))
+import Halogen.Component (Component, component)
+import Halogen.HTML (HTML)
 import Halogen.Query (action)
 import Halogen.VDom.Driver (runUI)
 import Prelude (unit, ($))
 import Utakata.Audio (createAudioContext)
+import Utakata.Eval (eval)
 import Utakata.LocalStorage (loadStorage')
 import Utakata.Render (render)
-import Utakata.Type (Effects, Input, Query(Update, Open), Storage(Storage), Output)
-import Utakata.Eval (eval)
+import Utakata.Type (Effects, Input, Output, Query(Update, Open), Mode(..), Storage(Storage))
 
 ui :: forall eff. Component HTML Query Input Output (Aff (Effects eff))
 ui = component {
@@ -38,7 +37,10 @@ ui = component {
         siblings: [],
         buffer: Nothing,
         source: Nothing,
-        position: 0.0
+        position: 0.0,
+        mode: RepeatOff,
+        volume: 1.0,
+        muted: false
     },
     receiver: \_ -> Nothing
 }
@@ -68,4 +70,6 @@ main = runHalogenAff do
         pure (Loop unit)
     ) unit
     pure unit 
+
+
 

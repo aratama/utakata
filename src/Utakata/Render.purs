@@ -7,21 +7,24 @@ import Data.CommutativeRing ((+))
 import Data.Either (Either(..))
 import Data.Formatter.Number (format)
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Data.Monoid ((<>))
 import Data.Show (show)
-import Data.String.Regex (match, regex, test)
+import Data.String.Regex (regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Data.Unit (Unit, unit)
 import Data.Void (Void)
+import Global (readFloat, readInt)
 import Halogen.HTML (HTML, text)
 import Halogen.HTML.Core (ClassName(..))
-import Halogen.HTML.Elements (button, div, i, input, option, select)
+import Halogen.HTML.Elements (button, div, i, input, option, select, span)
 import Halogen.HTML.Events (input_, onClick, onKeyDown, onValueChange)
 import Halogen.HTML.Properties (InputType(..), class_, max, min, selected, step, type_, value)
 import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
-import Prelude (negate, ($), (<$>), (==))
-import Utakata.Type (Query(..), State)
+import Prelude (negate, not, ($), (<$>), (<<<), (==))
+import Utakata.Audio (getDuration)
+import Utakata.Type (Mode(..), Query(..), State)
+
 
 icon :: forall p i. String -> HTML p i
 icon name = i [class_ (ClassName ("fa fa-" <> name))] []
@@ -32,11 +35,18 @@ render state = div [
         "d" -> Just (OpenDevTools unit)
         _ -> Nothing 
 ] [
+
     div [class_ (ClassName "top-row")] [
         button [class_ (ClassName "close-button"), onClick (input_ Minimize) ] [icon "window-minimize"],
         button [class_ (ClassName "close-button"), onClick (input_ Close) ] [icon "close"]    
     ], 
+
     div [class_ (ClassName "file-row")] [
+        case state.mode of 
+            RepeatOff -> modeButton RepeatOne "long-arrow-right"
+            RepeatOne -> modeButton RepeatAll "repeat"
+            RepeatAll -> modeButton Random "refresh"
+            Random -> modeButton RepeatOff "random", 
         select [
             class_ (ClassName "audio-title"), 
             onValueChange \value -> case state.filePath of 
@@ -49,19 +59,35 @@ render state = div [
         ] [icon "folder-open"]
     ],
     div [class_ (ClassName "controls")] [
-        button [ onClick (input_ Stop) ] [icon "stop"],
+        
+        span [] [text $ maybe "" (formatDutation <<< getDuration) state.buffer],      
+        div [class_ (ClassName "spacer")] [],        
+        
         button [ onClick (input_ (Move (negate 1))) ] [icon "backward"],
         case state.playing of 
             false -> button [ onClick (input_ Play) ] [icon "play"]
             true -> button [ onClick (input_ Pause) ] [icon "pause"],
         button [ onClick (input_ (Move 1)) ] [icon "forward"], 
-        button [ onClick (input_ OpenFileDialog) ] [icon "volume-up"]
+        div [class_ (ClassName "spacer")] [],        
+        button [ onClick (input_ (SetMute (not state.muted)))] [icon if state.muted then "volume-off" else "volume-up"], 
+        input [
+            class_ (ClassName "volume"), 
+            type_ InputRange, 
+            min 0.0, 
+            max 1.0, 
+            step (Step 0.01), 
+            value (show state.volume), 
+            onValueChange \value -> Just (SetVolume (readFloat value) unit)
+        ]
     ], 
-    div [] [
+    div [class_ (ClassName "timeline")] [
+          
         input [type_ InputRange, min 0.0, max 1.0, step (Step 0.001), value (show state.position)]
     ]
 ] 
   where 
+    modeButton next i = button [ onClick (input_ (SetMode next)) ] [icon i]
+
     renderOption :: forall p i. Int -> FilePath -> HTML p i    
     renderOption i entry = option [
         value entry, 
@@ -73,11 +99,19 @@ render state = div [
             Right pattern -> text if test pattern name then name else formatInt (toNumber (i + 1)) <> " " <> name     
     ]
 
-    formatInt i = format {
+    formatInt = format {
         comma: false,
         before: 2, 
         after: 0, 
         abbreviations: false, 
         sign: false
-    } i 
+    }
+
+    formatDutation = format {
+        comma: false,
+        before: 2, 
+        after: 1, 
+        abbreviations: false, 
+        sign: false
+    }
 

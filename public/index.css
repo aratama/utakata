@@ -62,6 +62,8 @@ button {
     transition-duration: 0.15s;
     margin: 4px;
     padding: 4px;
+    width: 2em;
+    height: 2em;
 }
 
 button:hover {
@@ -129,8 +131,19 @@ div.controls button {
 
 
 
+div.spacer {
+    width: 10px;
+}
+
+input[type="range"].volume {
+    width: 100px;
+}
 
 
+
+div.timeline {
+    display: flex; 
+}
 
 
 /* http://www.cssportal.com/style-input-range/ */
