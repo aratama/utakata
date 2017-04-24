@@ -1,10 +1,10 @@
 {
-  "name": "Cuica",
+  "name": "utakata",
   "version": "0.0.1",
   "description": "Simple Music Player",
   "main": "main.js",
   "scripts": {},
-  "repository": "https://github.com/aratama/cuica",
+  "repository": "https://github.com/aratama/utakata",
   "keywords": [
     "Electron"
   ],

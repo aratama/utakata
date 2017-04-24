@@ -18,6 +18,7 @@ exports.openDirectoryEff = function(reject){
             var browserWindow = electron.remote.BrowserWindow;
             var focusedWindow = browserWindow.getFocusedWindow();
             dialog.showOpenDialog(focusedWindow, {
+                filters: [{ name: "Audios", extensions: ["mp3", "wav", "ogg"] }],
                 properties: ["openFile"]
             }, function(directories){
                 resolve(typeof directories == "undefined" ? null : directories[0])();

@@ -64,7 +64,9 @@ exports.currentTime = function(context){
 
 exports.setGain = function(value){
     return function(graph){
-        graph.gain.gain.value = value;
+        return function(){
+            graph.gain.gain.value = value;
+        };
     };
 };
 

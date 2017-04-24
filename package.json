@@ -7,8 +7,9 @@
     "url": "https://github.com/aratama/utakata"
   },
   "scripts": {
-    "clean": "rimraf output .pulp-cache public/index.js utakata-win32-x64",
-    "clean-all": "rimraf output .pulp-cache public/index.js bower_components node_modules public/node_modules utakata-win32-x64",
+    "clean": "rimraf output .pulp-cache public/index.js",
+    "clean-builds": "rimraf utakata-win32-x64 utakata-win32-ia32 utakata-linux-x64 utakata-linux-ia32 utakata-linux-armv7l",
+    "clean-all": "npm run clean && rimraf bower_components node_modules public/node_modules && npm run clean-builds",
     "preelectron": "npm run build",
     "electron": "electron public",
     "prebuild": "purs compile \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
