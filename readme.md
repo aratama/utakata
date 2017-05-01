@@ -1,13 +1,12 @@
 # Utakata
 
-Simple Audio Player.
+WIP. Simple Audio Player.
 
 
-### launch
+### build
 
 ```
 npm install
 bower update
 npm run build
-npm run electron
 ```

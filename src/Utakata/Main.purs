@@ -9,38 +9,42 @@ import Control.Monad.Except.Trans (runExceptT)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
 import DOM.HTML (window)
 import DOM.HTML.Window (requestAnimationFrame)
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Identity (Identity(..))
 import Data.Maybe (Maybe(..))
+import Data.Newtype (unwrap)
 import Data.Unit (Unit)
 import Halogen.Aff.Util (runHalogenAff, awaitBody)
 import Halogen.Component (Component, component)
 import Halogen.HTML (HTML)
 import Halogen.Query (action)
 import Halogen.VDom.Driver (runUI)
-import Prelude (unit, ($))
+import Prelude (id, unit, ($))
 import Utakata.Audio (createAudioContext)
 import Utakata.Eval (eval)
 import Utakata.LocalStorage (loadStorage')
 import Utakata.Render (render)
-import Utakata.Type (Effects, Input, Output, Query(Update, Open), Mode(..), Storage(Storage))
+import Utakata.Type (Audio(..), Effects, Input, Mode(..), Output, Query(Update, Open), Storage(Storage))
 
-ui :: forall eff. Component HTML Query Input Output (Aff (Effects eff))
-ui = component {
+ui :: forall eff. Storage -> Component HTML Query Input Output (Aff (Effects eff))
+ui (Storage options) = component {
     render,
     eval,
     initialState: \context -> { 
         context,
-        playing: false,
         filePath: Nothing,
         siblings: [],
-        buffer: Nothing,
-        source: Nothing,
         position: 0.0,
-        mode: RepeatOff,
+        audio: NotLoaded, 
+        mode: case options.mode of 
+            "RepeatOff" -> RepeatOff
+            "RepeatOne" -> RepeatOne
+            "Random" -> Random            
+            _ -> RepeatAll,
         volume: 1.0,
-        muted: false
+        muted: false,
+        history: []
     },
     receiver: \_ -> Nothing
 }
@@ -51,8 +55,12 @@ main = runHalogenAff do
     body <- awaitBody
     context <- liftEff createAudioContext
     options <- liftEff loadStorage'
-    
-    io <- runUI ui context body  
+
+    let ops = case unwrap (runExceptT options) of 
+            Right o -> o
+            Left err -> Storage { filePath: NullOrUndefined Nothing, mode: "" }
+        
+    io <- runUI (ui ops) context body  
     case runExceptT options of 
         Identity (Right (Storage ops)) -> do 
             case ops.filePath of 

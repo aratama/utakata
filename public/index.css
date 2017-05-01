@@ -137,6 +137,26 @@ div.spacer {
 
 input[type="range"].volume {
     width: 100px;
+    flex-grow: 1.0;
+    flex-shrink: 1.0;
+}
+
+
+
+option span.audio-title {
+    text-align: left;
+}
+
+option span.duration {
+    width: 100px;
+    flex-grow: 1.0;
+    flex-shrink: 1.0;
+    text-align: right;
+}
+
+span.position {
+    width: 4em;
+    text-align: right;
 }
 
 

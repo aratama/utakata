@@ -25,17 +25,19 @@ exports.loadAudioEff = function(path){
 };
 
 exports.play = function(audioBuffer){
-    return function(context){
-        return function(){
-            var gain = context.createGain();
-            gain.connect(context.destination);
+    return function(offset){
+        return function(context){
+            return function(){
+                var gain = context.createGain();
+                gain.connect(context.destination);
 
-            var source = context.createBufferSource();
-            source.buffer = audioBuffer;        
-            source.connect(gain); 
-            source.start(0);
+                var source = context.createBufferSource();
+                source.buffer = audioBuffer;        
+                source.connect(gain); 
+                source.start(0, offset);
 
-            return { source: source, gain: gain };
+                return { source: source, gain: gain };
+            };
         };
     };
 };
@@ -47,6 +49,12 @@ exports.addEndEventListener = function(source){
                 onEnd({})();
             };
         };
+    };
+};
+
+exports.removeEndEventListener = function(source){
+    return function(){
+        source.onended = null;
     };
 };
 

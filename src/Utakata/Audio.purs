@@ -1,6 +1,6 @@
 module Utakata.Audio (
-    AudioBuffer, AudioBufferSource, AudioContext, GainNode, AudioGraph,
-    createAudioContext, loadAudio, play, stop, setGain, getDuration, addEndEventListener
+    AudioBuffer, AudioBufferSource, AudioContext, GainNode, AudioGraph, AudioTime,
+    createAudioContext, loadAudio, play, stop, setGain, getDuration, addEndEventListener, removeEndEventListener, currentTime
 ) where 
 
 import Control.Monad.Aff (Aff, makeAff)
@@ -11,6 +11,8 @@ import DOM (DOM)
 import DOM.Event.Event (Event)
 import Data.Unit (Unit)
 import Node.Path (FilePath)
+
+type AudioTime = Number
 
 foreign import data AudioBuffer :: Type
 
@@ -24,9 +26,11 @@ type AudioGraph = { source :: AudioBufferSource, gain :: GainNode }
 
 foreign import createAudioContext :: forall eff. Eff (dom :: DOM | eff) AudioContext
 
-foreign import play :: forall eff. AudioBuffer -> AudioContext -> Eff (dom :: DOM | eff) AudioGraph
+foreign import play :: forall eff. AudioBuffer -> AudioTime -> AudioContext -> Eff (dom :: DOM | eff) AudioGraph
 
 foreign import addEndEventListener :: forall eff. AudioBufferSource -> (Event -> Eff (dom :: DOM, avar :: AVAR | eff) Unit) -> Eff (dom :: DOM, avar :: AVAR | eff) Unit
+
+foreign import removeEndEventListener :: forall eff. AudioBufferSource -> Eff (dom :: DOM, avar :: AVAR | eff) Unit
 
 foreign import stop :: forall eff. AudioGraph -> Eff (dom :: DOM | eff) Unit
 
@@ -37,7 +41,7 @@ foreign import loadAudioEff :: forall eff. String -> AudioContext -> (Error -> E
 loadAudio :: forall eff. FilePath -> AudioContext -> Aff (dom :: DOM | eff) AudioBuffer
 loadAudio path context = makeAff (loadAudioEff path context)
 
-foreign import currentTime :: forall eff. Eff (dom :: DOM | eff) Number
+foreign import currentTime :: forall eff. AudioContext -> Eff (dom :: DOM | eff) Number
 
 foreign import getDuration :: AudioBuffer -> Number
 
