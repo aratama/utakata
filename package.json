@@ -7,19 +7,19 @@
     "url": "https://github.com/aratama/utakata"
   },
   "scripts": {
-    "clean": "rimraf output .pulp-cache public/index.js",
+    "install": "cd public && npm install",
+
+    "clean": "rimraf output public/purs_modules .pulp-cache",
     "clean-builds": "rimraf utakata-win32-x64 utakata-win32-ia32 utakata-linux-x64 utakata-linux-ia32 utakata-linux-armv7l",
     "clean-all": "npm run clean && rimraf bower_components node_modules public/node_modules && npm run clean-builds",
-    "preelectron": "npm run build",
-    "electron": "electron public",
-    "prebuild": "purs compile \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
-    "build": "purs bundle \"output/**/*.js\" --module Main --main Main --output public/index.js",
-    "prepack": "npm run build",
-    "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite --icon=./res/icon.ico --asar",
-    "prepack-all": "npm run build",    
-    "pack-all": "electron-packager public utakata --all --electron-version=1.4.16 --overwrite --icon=./res/icon.ico --asar",    
+
+    "compile": "purs compile --output public/purs_modules \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
+    "electron": "npm run compile && electron public",
+
+    "prepack": "npm run compile",
+    "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite --icon=./res/icon.ico",
     "postpack": "cd ./utakata-win32-x64/ && utakata",
-    "install": "cd public && npm install"
+    "pack-all": "electron-packager public utakata --all --electron-version=1.4.16 --overwrite --icon=./res/icon.ico"
   },
   "author": "",
   "license": "ISC",
