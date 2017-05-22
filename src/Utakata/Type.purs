@@ -13,18 +13,13 @@ import Node.Path (FilePath)
 import Utakata.Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
 import Utakata.LocalStorage (STORAGE)
 
-
-
 type State = {
     context :: AudioContext,
-    filePath :: Maybe FilePath, 
+    filePath :: Maybe FilePath,
     siblings :: Array FilePath,
-
-    position :: Number,    
-
-    audio :: Audio, 
+    position :: Number,
+    audio :: Audio,
     playing :: Boolean,
-
     mode :: Mode,
     volume :: Number,
     muted :: Boolean,
@@ -56,6 +51,7 @@ data Query a = OpenFileDialog a
              | SetMode Mode a
              | SetMute Boolean a
              | SetVolume Number a
+             | SetPosition Number a 
              | End a
 
 type Input = AudioContext

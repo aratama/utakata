@@ -19,7 +19,7 @@ import Global (readFloat)
 import Halogen.HTML (HTML, text)
 import Halogen.HTML.Core (ClassName(..))
 import Halogen.HTML.Elements (button, div, i, input, option, select, span)
-import Halogen.HTML.Events (input_, onClick, onKeyDown, onValueChange, onValueInput)
+import Halogen.HTML.Events (input_, onChange, onClick, onKeyDown, onValueChange, onValueInput)
 import Halogen.HTML.Properties (InputType(InputRange), class_, max, min, selected, step, type_, value)
 import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
 import Prelude (negate, not, ($), (<$>), (<<<), (==))
@@ -94,7 +94,9 @@ render state = div [
                 Loaded { buffer } -> getDuration buffer  
                 PlayingAudio { buffer } -> getDuration buffer, 
             step (Step 0.001), 
-            value (show state.position)
+            value (show state.position), 
+            onValueChange \value -> Just (SetPosition (readFloat value) unit), 
+            onValueInput \value -> Just (SetPosition (readFloat value) unit)
         ]
     ]
 ] 

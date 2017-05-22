@@ -201,6 +201,19 @@ eval = case _ of
         updateGain 
         pure next 
 
+    SetPosition position next -> do 
+        liftEff $ log $ "SetPosition: " <> show position
+        state <- get
+        case state.audio of 
+            PlayingAudio { source, buffer } -> do  
+                modify _ { audio = Loaded { buffer }, position = position }
+                liftEff do 
+                    removeEndEventListener source.source
+                    stop source
+                playAudio buffer
+            _ -> pure unit
+        pure next
+
   where 
     saveOptions = do 
         state <- get 
