@@ -8,6 +8,7 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Except.Trans (runExceptT)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
 import DOM.HTML (window)
+import DOM.HTML.HTMLMediaElement (setVolume)
 import DOM.HTML.Window (requestAnimationFrame)
 import Data.Either (Either(..), either)
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
@@ -22,6 +23,7 @@ import Halogen.Query (action)
 import Halogen.VDom.Driver (runUI)
 import Prelude (id, unit, ($))
 import Utakata.Audio (createAudioContext)
+import Utakata.Audio (setGain)
 import Utakata.Eval (eval)
 import Utakata.LocalStorage (loadStorage')
 import Utakata.Render (render)
@@ -42,7 +44,7 @@ ui (Storage options) = component {
             "RepeatOne" -> RepeatOne
             "Random" -> Random            
             _ -> RepeatAll,
-        volume: 1.0,
+        volume: options.volume,
         muted: false,
         history: []
     },
@@ -58,7 +60,11 @@ main = runHalogenAff do
 
     let ops = case unwrap (runExceptT options) of 
             Right o -> o
-            Left err -> Storage { filePath: NullOrUndefined Nothing, mode: "" }
+            Left err -> Storage { 
+                filePath: NullOrUndefined Nothing, 
+                mode: "", 
+                volume: 1.0
+            }
         
     io <- runUI (ui ops) context body  
     case runExceptT options of 

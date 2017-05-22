@@ -14,6 +14,7 @@ import Utakata.Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
 import Utakata.LocalStorage (STORAGE)
 
 
+
 type State = {
     context :: AudioContext,
     filePath :: Maybe FilePath, 
@@ -31,7 +32,13 @@ type State = {
 
 data Audio = NotLoaded | 
              Loaded { buffer :: AudioBuffer } | 
-             PlayingAudio { buffer :: AudioBuffer, source :: AudioGraph, playStart :: AudioTime, currentTime :: AudioTime }
+             PlayingAudio { 
+                 buffer :: AudioBuffer, 
+                 source :: AudioGraph, 
+                 playStart :: AudioTime,
+                 startPosition :: Number, 
+                 currentTime :: AudioTime 
+            }
 
 data Mode = RepeatOff | RepeatOne | RepeatAll | Random
 
@@ -62,7 +69,8 @@ type Effects eff = HalogenEffects (
 
 newtype Storage = Storage {
     filePath :: NullOrUndefined FilePath,
-    mode :: String
+    mode :: String, 
+    volume :: Number
 }
 
 derive instance genericStorage :: Generic Storage _

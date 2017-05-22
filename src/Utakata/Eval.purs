@@ -5,7 +5,7 @@ import Control.Bind (bind, discard)
 import Control.Monad.Aff (Aff, makeAff)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Console (log)
+import Control.Monad.Eff.Console (log, logShow)
 import Control.Monad.Fork.Class (fork)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
@@ -124,6 +124,7 @@ eval = case _ of
             Loaded { buffer } -> do  
                 liftEff $ log $ "play-file: " <> show state.filePath
                 graph <- liftEff $ play buffer state.position state.context 
+                liftEff $ setGain (state.volume * state.volume) graph
                 startTime <- liftEff $ currentTime state.context
                 subscribe $ eventSource (addEndEventListener graph.source) (\e -> Just (End Done))
                 modify _ { 
@@ -131,6 +132,7 @@ eval = case _ of
                         buffer: buffer,
                         source: graph,
                         playStart: startTime,
+                        startPosition: state.position,
                         currentTime: startTime
                     }
                 }
@@ -175,10 +177,10 @@ eval = case _ of
     Update next -> do
         state <- get 
         case state.audio of
-            PlayingAudio { playStart } -> do  
+            PlayingAudio { playStart, startPosition } -> do  
                 currentTime <- liftEff $ currentTime state.context 
                 modify _ {
-                    position = state.position + (currentTime - playStart)
+                    position = startPosition + currentTime - playStart
                 }
             _ -> pure unit
         pure next
@@ -219,7 +221,8 @@ eval = case _ of
         state <- get 
         liftEff $ saveStorage' $ Storage {
             filePath: NullOrUndefined state.filePath,
-            mode: show state.mode 
+            mode: show state.mode,
+            volume: state.volume
         }
 
     updateGain = do 

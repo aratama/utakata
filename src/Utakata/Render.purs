@@ -87,14 +87,15 @@ render state = div [
         ]
     ], 
     div [class_ (ClassName "timeline")] [
-        input 
-            [type_ InputRange, 
+        input [
+            type_ InputRange, 
             min 0.0, 
             max case state.audio of 
                 NotLoaded -> 1.0 
                 Loaded { buffer } -> getDuration buffer  
                 PlayingAudio { buffer } -> getDuration buffer, 
-            step (Step 0.001), value (show state.position)
+            step (Step 0.001), 
+            value (show state.position)
         ]
     ]
 ] 

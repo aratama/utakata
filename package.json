@@ -7,16 +7,18 @@
     "url": "https://github.com/aratama/utakata"
   },
   "scripts": {
-    "install": "cd public && npm install",
+    "install": "cd public && yarn install",
 
     "clean": "rimraf output public/purs_modules .pulp-cache",
     "clean-builds": "rimraf utakata-win32-x64 utakata-win32-ia32 utakata-linux-x64 utakata-linux-ia32 utakata-linux-armv7l",
-    "clean-all": "npm run clean && rimraf bower_components node_modules public/node_modules && npm run clean-builds",
+    "clean-all": "yarn run clean && rimraf bower_components node_modules public/node_modules && yarn run clean-builds",
 
     "compile": "purs compile --output public/purs_modules \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
-    "electron": "npm run compile && electron public",
+    "electron": "yarn run compile && electron public",
 
-    "prepack": "npm run compile",
+    "build-ide": "purs compile --json-errors \"bower_components/purescript-*/src/**/*.purs\" \"src/**/*.purs\"",
+
+    "prepack": "yarn run compile",
     "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite --icon=./res/icon.ico",
     "postpack": "cd ./utakata-win32-x64/ && utakata",
     "pack-all": "electron-packager public utakata --all --electron-version=1.4.16 --overwrite --icon=./res/icon.ico"
