@@ -23,6 +23,7 @@ type State = {
     position :: Number,    
 
     audio :: Audio, 
+    playing :: Boolean,
 
     mode :: Mode,
     volume :: Number,

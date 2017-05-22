@@ -39,6 +39,7 @@ ui (Storage options) = component {
         siblings: [],
         position: 0.0,
         audio: NotLoaded, 
+        playing: false,
         mode: case options.mode of 
             "RepeatOff" -> RepeatOff
             "RepeatOne" -> RepeatOne
@@ -50,7 +51,6 @@ ui (Storage options) = component {
     },
     receiver: \_ -> Nothing
 }
-
 
 main :: forall eff. Eff (Effects eff) Unit
 main = runHalogenAff do

@@ -2,23 +2,20 @@ module Utakata.Eval (eval) where
 
 import Control.Applicative (pure, when)
 import Control.Bind (bind, discard)
-import Control.Monad.Aff (Aff, makeAff)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Console (log, logShow)
-import Control.Monad.Fork.Class (fork)
+import Control.Monad.Eff.Console (log)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
 import Data.Array (catMaybes, findIndex, head, index, nub, (:))
-import Data.BooleanAlgebra ((&&))
 import Data.CommutativeRing ((+))
 import Data.EuclideanRing ((-))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
-import Data.Maybe (Maybe(..), fromMaybe, isNothing, maybe)
-import Data.Monoid ((<>))
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
-import Data.Traversable (for, for_)
+import Data.Traversable (for)
 import Data.Unit (unit)
 import Halogen.Component (ComponentDSL)
 import Halogen.Query (gets)
@@ -28,7 +25,7 @@ import Node.FS.Aff (readdir)
 import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
 import Node.Path (basename, dirname, extname)
-import Prelude (($), (*), (<$>), (<<<), (<>), (==))
+import Prelude (($), (*), (<$>), (<>), (==))
 import Utakata.Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
 import Utakata.Electron (close, minimize, openDirectory, openDevTools)
 import Utakata.LocalStorage (saveStorage')
@@ -94,12 +91,10 @@ eval = case _ of
                 }
 
                 -- play current audio if playing 
-                case state.audio of 
-                    PlayingAudio _ -> do 
-                        updateGain
-                        eval (Play unit)
-                    _ -> pure unit
-
+                when state.playing do 
+                    updateGain
+                    eval (Play unit)
+                
             _ -> pure unit 
 
         pure next 
@@ -119,23 +114,12 @@ eval = case _ of
 
     Play next -> do
         liftEff $ log "play"
+        modify \s -> s { playing = true }
         state <- get 
         case state.audio of
-            Loaded { buffer } -> do  
+            Loaded { buffer } | state.playing -> do  
                 liftEff $ log $ "play-file: " <> show state.filePath
-                graph <- liftEff $ play buffer state.position state.context 
-                liftEff $ setGain (state.volume * state.volume) graph
-                startTime <- liftEff $ currentTime state.context
-                subscribe $ eventSource (addEndEventListener graph.source) (\e -> Just (End Done))
-                modify _ { 
-                    audio = PlayingAudio {
-                        buffer: buffer,
-                        source: graph,
-                        playStart: startTime,
-                        startPosition: state.position,
-                        currentTime: startTime
-                    }
-                }
+                playAudio buffer
                 pure unit 
 
             _ -> pure unit 
@@ -155,6 +139,7 @@ eval = case _ of
 
     Pause next -> do 
         liftEff $ log "pause"
+        modify \s -> s { playing = false }
         state <- get 
         case state.audio of 
             PlayingAudio { buffer, source } -> do 
@@ -230,4 +215,21 @@ eval = case _ of
         case state.audio of
             PlayingAudio { source } -> liftEff $ setGain (if state.muted then 0.0 else state.volume * state.volume) source
             _ -> pure unit 
+
+
+    playAudio buffer = do
+        state <- get 
+        graph <- liftEff $ play buffer state.position state.context 
+        liftEff $ setGain (state.volume * state.volume) graph
+        startTime <- liftEff $ currentTime state.context
+        subscribe $ eventSource (addEndEventListener graph.source) (\e -> Just (End Done))
+        modify _ { 
+            audio = PlayingAudio {
+                buffer: buffer,
+                source: graph,
+                playStart: startTime,
+                startPosition: state.position,
+                currentTime: startTime
+            }
+        }
 

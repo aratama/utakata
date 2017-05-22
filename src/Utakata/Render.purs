@@ -8,21 +8,21 @@ import Data.Either (Either(..))
 import Data.EuclideanRing (mod)
 import Data.Formatter.Number (format)
 import Data.Int (floor, toNumber)
-import Data.Maybe (Maybe(Just, Nothing), maybe)
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Monoid ((<>))
 import Data.Show (show)
 import Data.String.Regex (regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Data.Unit (Unit, unit)
 import Data.Void (Void)
-import Global (readFloat, readInt)
+import Global (readFloat)
 import Halogen.HTML (HTML, text)
 import Halogen.HTML.Core (ClassName(..))
 import Halogen.HTML.Elements (button, div, i, input, option, select, span)
 import Halogen.HTML.Events (input_, onClick, onKeyDown, onValueChange, onValueInput)
-import Halogen.HTML.Properties (InputType(..), class_, disabled, max, min, selected, step, type_, value)
+import Halogen.HTML.Properties (InputType(InputRange), class_, max, min, selected, step, type_, value)
 import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
-import Prelude (negate, not, ($), (-), (<$>), (<<<), (==))
+import Prelude (negate, not, ($), (<$>), (<<<), (==))
 import Prelude (div) as Prelude
 import Utakata.Audio (getDuration)
 import Utakata.Type (Audio(..), Mode(..), Query(..), State)
@@ -68,10 +68,9 @@ render state = div [
         div [class_ (ClassName "spacer")] [],        
         
         button [ onClick (input_ (Move (negate 1))) ] [icon "backward"],
-        case state.audio of
-            NotLoaded -> button [ onClick (input_ Play), disabled true] [icon "play"]
-            Loaded _ -> button [ onClick (input_ Play) ] [icon "play"]
-            PlayingAudio _ -> button [ onClick (input_ Pause) ] [icon "pause"],
+        if state.playing 
+            then button [ onClick (input_ Pause) ] [icon "pause"]
+            else button [ onClick (input_ Play) ] [icon "play"],
         button [ onClick (input_ (Move 1)) ] [icon "forward"], 
         div [class_ (ClassName "spacer")] [],        
         button [ onClick (input_ (SetMute (not state.muted)))] [icon if state.muted then "volume-off" else "volume-up"], 
