@@ -1,12 +1,13 @@
 # Utakata
 
-WIP. Simple Audio Player.
+![utakata-screenshot.png](https://rawgit.com/aratama/utakata/master/docs/utakata-screenshot.png)
 
+Simple experimental audio player app.
 
 ### build
 
 ```
-npm install
+yarn install
 bower update
-npm run build
+yarn run electron
 ```
