@@ -2,10 +2,10 @@ module Utakata.Eval (eval) where
 
 import Control.Applicative (pure, when)
 import Control.Bind (bind, discard)
-import Control.Monad.Aff (Aff)
+import Control.Monad.Aff (Aff, attempt)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Console (log)
+import Control.Monad.Eff.Console (log, logShow)
 import Control.Monad.Eff.Random (randomInt)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
@@ -14,6 +14,7 @@ import Data.CommutativeRing ((+))
 import Data.EuclideanRing ((-))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Either (Either(Left, Right))
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
 import Data.Traversable (for)
@@ -87,21 +88,30 @@ eval = case _ of
             }
 
         -- load the audio file
-        audio <- liftAff $ loadAudio filePath state.context
-        currentAudioPath <- gets _.filePath 
-        state' <- get         
-        case state'.audio of 
-            NotLoaded | currentAudioPath == Just filePath -> do
-                modify _ { 
-                    audio = Loaded { buffer: audio } 
-                }
+        
 
-                -- play current audio if playing 
-                when state.playing do 
-                    updateGain
-                    eval (Play unit)
-                
-            _ -> pure unit 
+        audioE <- liftAff $ attempt $ loadAudio filePath state.context
+        case audioE of 
+
+            Left err -> do
+                liftEff $ logShow err
+                pure unit
+
+            Right audio -> do 
+                currentAudioPath <- gets _.filePath 
+                state' <- get         
+                case state'.audio of 
+                    NotLoaded | currentAudioPath == Just filePath -> do
+                        modify _ { 
+                            audio = Loaded { buffer: audio } 
+                        }
+
+                        -- play current audio if playing 
+                        when state.playing do 
+                            updateGain
+                            eval (Play unit)
+                        
+                    _ -> pure unit 
 
         pure next 
 

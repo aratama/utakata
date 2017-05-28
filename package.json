@@ -24,7 +24,7 @@
     "pack-all": "electron-packager public utakata --all --electron-version=1.4.16 --overwrite --icon=./res/icon.ico"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "electron": "^1.6.5"
   },
