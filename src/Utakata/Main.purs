@@ -8,9 +8,8 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Except.Trans (runExceptT)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
 import DOM.HTML (window)
-import DOM.HTML.HTMLMediaElement (setVolume)
 import DOM.HTML.Window (requestAnimationFrame)
-import Data.Either (Either(..), either)
+import Data.Either (Either(Right, Left))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Identity (Identity(..))
 import Data.Maybe (Maybe(..))
@@ -21,9 +20,8 @@ import Halogen.Component (Component, component)
 import Halogen.HTML (HTML)
 import Halogen.Query (action)
 import Halogen.VDom.Driver (runUI)
-import Prelude (id, unit, ($))
+import Prelude (unit, ($))
 import Utakata.Audio (createAudioContext)
-import Utakata.Audio (setGain)
 import Utakata.Eval (eval)
 import Utakata.LocalStorage (loadStorage')
 import Utakata.Render (render)
@@ -68,8 +66,8 @@ main = runHalogenAff do
         
     io <- runUI (ui ops) context body  
     case runExceptT options of 
-        Identity (Right (Storage ops)) -> do 
-            case ops.filePath of 
+        Identity (Right (Storage ops')) -> do 
+            case ops'.filePath of 
                 NullOrUndefined (Just path) -> io.query (action (Open path))
                 _ -> pure unit
         _ -> pure unit 

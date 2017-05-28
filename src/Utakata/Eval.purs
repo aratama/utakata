@@ -9,11 +9,11 @@ import Control.Monad.Eff.Console (log)
 import Control.Monad.Eff.Random (randomInt)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
-import Data.Array (catMaybes, cons, difference, findIndex, head, index, length, nub, (!!), (:), null, take, reverse, deleteAt, elemIndex, sort)
+import Data.Array (catMaybes, deleteAt, elemIndex, findIndex, head, index, length, sort, (!!), (:))
 import Data.CommutativeRing ((+))
 import Data.EuclideanRing ((-))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
-import Data.Maybe (Maybe(Just, Nothing), fromMaybe, maybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
 import Data.Traversable (for)
@@ -26,12 +26,11 @@ import Node.FS.Aff (readdir)
 import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
 import Node.Path (basename, dirname, extname, resolve)
-import Prelude (($), (*), (<$>), (<>), (==), (/=), (/), mod)
+import Prelude (mod, ($), (*), (/=), (<$>), (<>), (==))
 import Utakata.Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
 import Utakata.Electron (close, minimize, openDirectory, openDevTools)
 import Utakata.LocalStorage (saveStorage')
 import Utakata.Type (Audio(..), Effects, Mode(..), Output, Query(..), State, Storage(Storage))
-
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval = case _ of
@@ -147,8 +146,8 @@ eval = case _ of
                 fromMaybe (pure unit) do  
                     currentFilePath <- state.filePath
                     index <- elemIndex (basename currentFilePath) state.randoms
-                    next <- state.randoms !! (mod index (length state.randoms) + 1)
-                    pure $ eval (Open (resolve [dirname currentFilePath] next) unit)
+                    nextFile <- state.randoms !! (mod index (length state.randoms) + 1)
+                    pure $ eval (Open (resolve [dirname currentFilePath] nextFile) unit)
 
             _, _ -> pure unit 
         pure next 
@@ -245,7 +244,6 @@ eval = case _ of
             PlayingAudio { source } -> liftEff $ setGain (if state.muted then 0.0 else state.volume * state.volume) source
             _ -> pure unit 
 
-
     playAudio buffer = do
         state <- get 
         graph <- liftEff $ play buffer state.position state.context 
@@ -261,9 +259,6 @@ eval = case _ of
                 currentTime: startTime
             }
         }
-
-
-
 
     shuffle xs = do 
         i <- randomInt 0 (length xs - 1)
