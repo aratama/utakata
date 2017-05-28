@@ -9,8 +9,10 @@ exports.loadAudioEff = function(path){
             return function(resolve){
                 return function(){
                     var fs = require("fs");
+                    console.log("loadAudioEff: " + path);
                     fs.readFile(path, function(error, nodeBuffer){
                         if (error){
+                            debugger;
                             reject(error)();
                         }else{
                             context.decodeAudioData(nodeBuffer.buffer, function(audioBuffer) {

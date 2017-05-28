@@ -37,6 +37,7 @@ ui (Storage options) = component {
         context,
         filePath: Nothing,
         siblings: [],
+        randoms: [],
         position: 0.0,
         audio: NotLoaded, 
         playing: false,
@@ -46,8 +47,7 @@ ui (Storage options) = component {
             "Random" -> Random            
             _ -> RepeatAll,
         volume: options.volume,
-        muted: false,
-        history: []
+        muted: false
     },
     receiver: \_ -> Nothing
 }

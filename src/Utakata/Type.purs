@@ -12,18 +12,21 @@ import Node.FS.Aff (FS)
 import Node.Path (FilePath)
 import Utakata.Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
 import Utakata.LocalStorage (STORAGE)
+import Control.Monad.Eff.Random (RANDOM)
 
 type State = {
     context :: AudioContext,
     filePath :: Maybe FilePath,
-    siblings :: Array FilePath,
+
     position :: Number,
     audio :: Audio,
     playing :: Boolean,
     mode :: Mode,
     volume :: Number,
     muted :: Boolean,
-    history :: Array FilePath
+
+    siblings :: Array String,
+    randoms :: Array String
 }
 
 data Audio = NotLoaded | 
@@ -61,7 +64,8 @@ type Output = Void
 type Effects eff = HalogenEffects (
     fs :: FS, 
     console :: CONSOLE,
-    storage :: STORAGE "Utakata.Storage" Storage
+    storage :: STORAGE "Utakata.Storage" Storage, 
+    random :: RANDOM
         | eff)
 
 newtype Storage = Storage {

@@ -6,13 +6,14 @@ import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (log)
+import Control.Monad.Eff.Random (randomInt)
 import Control.Monad.State (modify)
 import Control.Monad.State.Class (get)
-import Data.Array (catMaybes, findIndex, head, index, nub, (:))
+import Data.Array (catMaybes, cons, difference, findIndex, head, index, length, nub, (!!), (:), null, take, reverse, deleteAt, elemIndex, sort)
 import Data.CommutativeRing ((+))
 import Data.EuclideanRing ((-))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
-import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
+import Data.Maybe (Maybe(Just, Nothing), fromMaybe, maybe)
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
 import Data.Traversable (for)
@@ -24,8 +25,8 @@ import Halogen.Query.HalogenM (subscribe)
 import Node.FS.Aff (readdir)
 import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
-import Node.Path (basename, dirname, extname)
-import Prelude (($), (*), (<$>), (<>), (==))
+import Node.Path (basename, dirname, extname, resolve)
+import Prelude (($), (*), (<$>), (<>), (==), (/=), (/), mod)
 import Utakata.Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
 import Utakata.Electron (close, minimize, openDirectory, openDevTools)
 import Utakata.LocalStorage (saveStorage')
@@ -64,7 +65,6 @@ eval = case _ of
         modify _ { 
             filePath = Just filePath,
             audio = NotLoaded,
-            history = nub (filePath : state.history), 
             position = 0.0
         }
 
@@ -78,7 +78,14 @@ eval = case _ of
                 ".wave" -> Just entry 
                 ".ogg" -> Just entry  
                 _ -> Nothing
-        modify _ { siblings = files }
+
+        -- update shuffled play list
+        when (sort files /= sort state.randoms) do 
+            randoms <- liftEff $ shuffle files
+            modify _ { 
+                siblings = files, 
+                randoms = randoms
+            }
 
         -- load the audio file
         audio <- liftAff $ loadAudio filePath state.context
@@ -104,10 +111,13 @@ eval = case _ of
         liftEff $ log $ "move " <> show delta
         state <- get  
         fromMaybe (pure unit) do 
+            let list = case state.mode of 
+                    Random -> state.randoms 
+                    _ -> state.siblings
             filePath <- state.filePath 
-            i <- findIndex (\x -> x == basename filePath) state.siblings
-            file <- index state.siblings (i + delta)
-            pure $ eval (Open (dirname filePath <> "/" <> file) unit)
+            i <- findIndex (\x -> x == basename filePath) list
+            file <- index list (mod (length list + i + delta) (length list))
+            pure $ eval (Open (resolve [dirname filePath] file) unit)
 
         saveOptions
         pure next
@@ -133,7 +143,13 @@ eval = case _ of
             PlayingAudio _, RepeatOff -> eval (Stop unit) 
             PlayingAudio _, RepeatOne -> eval (Move 0 unit)
             PlayingAudio _, RepeatAll -> eval (Move 1 unit)
-            PlayingAudio _, Random -> eval (Move 1 unit)
+            PlayingAudio _, Random -> do 
+                fromMaybe (pure unit) do  
+                    currentFilePath <- state.filePath
+                    index <- elemIndex (basename currentFilePath) state.randoms
+                    next <- state.randoms !! (mod index (length state.randoms) + 1)
+                    pure $ eval (Open (resolve [dirname currentFilePath] next) unit)
+
             _, _ -> pure unit 
         pure next 
 
@@ -245,4 +261,16 @@ eval = case _ of
                 currentTime: startTime
             }
         }
+
+
+
+
+    shuffle xs = do 
+        i <- randomInt 0 (length xs - 1)
+        fromMaybe (pure []) do 
+            y <- xs !! i 
+            ys <- deleteAt i xs
+            Just do 
+                ys' <- shuffle ys
+                pure (y : ys')
 
