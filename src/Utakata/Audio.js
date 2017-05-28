@@ -12,12 +12,16 @@ exports.loadAudioEff = function(path){
                     console.log("loadAudioEff: " + path);
                     fs.readFile(path, function(error, nodeBuffer){
                         if (error){
-                            debugger;
                             reject(error)();
                         }else{
-                            context.decodeAudioData(nodeBuffer.buffer, function(audioBuffer) {
-                                resolve(audioBuffer)();
-                            });
+                            context.decodeAudioData(nodeBuffer.buffer).then(
+                                function(audioBuffer) {
+                                    resolve(audioBuffer)();
+                                }, 
+                                function(err){
+                                    reject(err)();
+                                }
+                            );
                         }
                     });                
                 };
