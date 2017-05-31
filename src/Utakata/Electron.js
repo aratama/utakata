@@ -10,7 +10,7 @@ exports.close = function(){
     window.close();
 };
 
-exports.openDirectoryEff = function(reject){
+exports.showOpenDialogEff = function(reject){
     return function(resolve){
         return function(){
             var electron = require('electron');

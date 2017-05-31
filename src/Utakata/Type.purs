@@ -7,6 +7,7 @@ import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe)
 import Data.Show (class Show)
 import Data.Void (Void)
+import Data.Functor (class Functor)
 import Halogen.Aff.Effects (HalogenEffects)
 import Node.FS.Aff (FS)
 import Node.Path (FilePath)
@@ -15,33 +16,32 @@ import Utakata.LocalStorage (STORAGE)
 import Control.Monad.Eff.Random (RANDOM)
 
 type State = {
-    context :: AudioContext,
     filePath :: Maybe FilePath,
-
+    siblings :: Array String,
+    randoms :: Array String,
+    context :: AudioContext,
     position :: Number,
-    audio :: Audio,
+    audio :: AudioState,
     playing :: Boolean,
     mode :: Mode,
     volume :: Number,
-    muted :: Boolean,
-
-    siblings :: Array String,
-    randoms :: Array String
+    muted :: Boolean
 }
 
-data Audio = NotLoaded | 
-             Loaded { buffer :: AudioBuffer } | 
-             PlayingAudio { 
-                 buffer :: AudioBuffer, 
-                 source :: AudioGraph, 
-                 playStart :: AudioTime,
-                 startPosition :: Number, 
-                 currentTime :: AudioTime 
-            }
+data AudioState =   
+    NotLoaded | 
+    Loaded { buffer :: AudioBuffer } | 
+    PlayingAudio { 
+        buffer :: AudioBuffer, 
+        source :: AudioGraph, 
+        playStart :: AudioTime,
+        startPosition :: Number, 
+        currentTime :: AudioTime 
+    }
 
 data Mode = RepeatOff | RepeatOne | RepeatAll | Random
 
-data Query a = OpenFileDialog a
+data Query a = ShowOpenDialog a
              | Open FilePath a
              | Play a
              | Pause a 
@@ -80,3 +80,10 @@ derive instance genericMode :: Generic Mode _
 
 instance showMode :: Show Mode where 
     show = genericShow
+
+derive instance genericQuery :: Generic (Query a) _ 
+
+instance showQuery :: (Show a) => Show (Query a) where 
+    show = genericShow
+
+derive instance functorQuery :: Functor Query 

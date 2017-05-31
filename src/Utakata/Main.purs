@@ -25,7 +25,7 @@ import Utakata.Audio (createAudioContext)
 import Utakata.Eval (eval)
 import Utakata.LocalStorage (loadStorage')
 import Utakata.Render (render)
-import Utakata.Type (Audio(..), Effects, Input, Mode(..), Output, Query(Update, Open), Storage(Storage))
+import Utakata.Type (AudioState(..), Effects, Input, Mode(..), Output, Query(Update, Open), Storage(Storage))
 
 ui :: forall eff. Storage -> Component HTML Query Input Output (Aff (Effects eff))
 ui (Storage options) = component {

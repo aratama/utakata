@@ -25,7 +25,7 @@ import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
 import Prelude (negate, not, ($), (<$>), (<<<), (==))
 import Prelude (div) as Prelude
 import Utakata.Audio (getDuration)
-import Utakata.Type (Audio(..), Mode(..), Query(..), State)
+import Utakata.Type (AudioState(..), Mode(..), Query(..), State)
 
 
 icon :: forall p i. String -> HTML p i
@@ -57,7 +57,7 @@ render state = div [
         ] (mapWithIndex renderOption state.siblings),
         button [
             class_ (ClassName "open"), 
-            onClick (input_ OpenFileDialog) 
+            onClick (input_ ShowOpenDialog) 
         ] [icon "folder-open"]
     ],
     div [class_ (ClassName "controls")] [
