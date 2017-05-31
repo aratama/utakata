@@ -34,23 +34,12 @@ import Utakata.LocalStorage (saveStorage')
 import Utakata.Type (AudioState(..), Effects, Mode(..), Output, Query(..), State, Storage(Storage))
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
-
-eval (Update next) = do 
-    state <- get 
-    case state.audio of
-        PlayingAudio { playStart, startPosition } -> do  
-            currentTime <- liftEff $ currentTime state.context 
-            modify _ {
-                position = startPosition + currentTime - playStart
-            }
-        _ -> pure unit
-    pure next
-
-
 eval query = do 
 
     -- log query
-    liftEff $ logShow (const unit <$> query)
+    case query of
+        Update next -> pure unit --ignore
+        _ -> liftEff $ logShow (const unit <$> query)
 
     case query of
 
@@ -187,7 +176,14 @@ eval query = do
             pure next
 
         Update next -> do
-            -- never come here
+            state <- get 
+            case state.audio of
+                PlayingAudio { playStart, startPosition } -> do  
+                    currentTime <- liftEff $ currentTime state.context 
+                    modify _ {
+                        position = startPosition + currentTime - playStart
+                    }
+                _ -> pure unit
             pure next
 
         Minimize next -> do 
