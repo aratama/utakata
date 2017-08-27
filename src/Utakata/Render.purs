@@ -6,7 +6,7 @@ import Data.Array (mapWithIndex)
 import Data.CommutativeRing ((+))
 import Data.Either (Either(..))
 import Data.EuclideanRing (mod)
-import Data.Formatter.Number (format)
+import Data.Formatter.Number (format, Formatter(..))
 import Data.Int (floor, toNumber)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Monoid ((<>))
@@ -19,7 +19,7 @@ import Global (readFloat)
 import Halogen.HTML (HTML, text)
 import Halogen.HTML.Core (ClassName(..))
 import Halogen.HTML.Elements (button, div, i, input, option, select, span)
-import Halogen.HTML.Events (input_, onChange, onClick, onKeyDown, onValueChange, onValueInput)
+import Halogen.HTML.Events (input_, onClick, onKeyDown, onValueChange, onValueInput)
 import Halogen.HTML.Properties (InputType(InputRange), class_, max, min, selected, step, type_, value)
 import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
 import Prelude (negate, not, ($), (<$>), (<<<), (==))
@@ -115,11 +115,11 @@ render state = div [
     ]
 
     formatInt :: Int -> String
-    formatInt = format {
+    formatInt = format (Formatter {
         comma: false,
         before: 2, 
         after: 0, 
         abbreviations: false, 
         sign: false
-    } <<< toNumber
+    }) <<< toNumber
 

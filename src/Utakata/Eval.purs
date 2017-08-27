@@ -33,6 +33,7 @@ import Utakata.Electron (close, minimize, showOpenDialog, openDevTools)
 import Utakata.LocalStorage (saveStorage')
 import Utakata.Type (AudioState(..), Effects, Mode(..), Output, Query(..), State, Storage(Storage))
 
+
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval query = do 
 
