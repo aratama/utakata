@@ -1,4 +1,4 @@
-module Utakata.LocalStorage (STORAGE, loadStorage, saveStorage, loadStorage', saveStorage') where 
+module LocalStorage (STORAGE, loadStorage, saveStorage, loadStorage', saveStorage') where 
 
 import Control.Monad.Eff (Eff, kind Effect)
 import Control.Monad.Except.Trans (ExceptT)

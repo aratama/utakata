@@ -28,9 +28,9 @@ import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
 import Node.Path (basename, dirname, extname, resolve)
 import Prelude (mod, ($), (*), (/=), (<$>), (<>), (==), const, unit)
-import Utakata.Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
-import Utakata.Electron (close, minimize, showOpenDialog, openDevTools)
-import Utakata.LocalStorage (saveStorage')
+import Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
+import Electron (close, minimize, showOpenDialog, openDevTools)
+import LocalStorage (saveStorage')
 import Utakata.Type (AudioState(..), Effects, Mode(..), Output, Query(..), State, Storage(Storage))
 
 

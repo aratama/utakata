@@ -24,7 +24,7 @@ import Halogen.HTML.Properties (InputType(InputRange), class_, max, min, selecte
 import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
 import Prelude (negate, not, ($), (<$>), (<<<), (==))
 import Prelude (div) as Prelude
-import Utakata.Audio (getDuration)
+import Audio (getDuration)
 import Utakata.Type (AudioState(..), Mode(..), Query(..), State)
 
 

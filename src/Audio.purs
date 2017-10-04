@@ -1,4 +1,4 @@
-module Utakata.Audio (
+module Audio (
     AudioBuffer, AudioBufferSource, AudioContext, GainNode, AudioGraph, AudioTime,
     createAudioContext, loadAudio, play, stop, setGain, getDuration, addEndEventListener, removeEndEventListener, currentTime
 ) where 

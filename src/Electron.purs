@@ -1,4 +1,4 @@
-module Utakata.Electron (close, minimize, showOpenDialog, home, openDevTools) where 
+module Electron (close, minimize, showOpenDialog, home, openDevTools) where 
 
 import Control.Apply ((<$>))
 import Control.Monad.Aff (makeAff)

@@ -11,8 +11,8 @@ import Data.Functor (class Functor)
 import Halogen.Aff.Effects (HalogenEffects)
 import Node.FS.Aff (FS)
 import Node.Path (FilePath)
-import Utakata.Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
-import Utakata.LocalStorage (STORAGE)
+import Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
+import LocalStorage (STORAGE)
 import Control.Monad.Eff.Random (RANDOM)
 
 type State = {
@@ -28,10 +28,10 @@ type State = {
     muted :: Boolean
 }
 
-data AudioState =   
-    NotLoaded | 
-    Loaded { buffer :: AudioBuffer } | 
-    PlayingAudio { 
+data AudioState 
+    = NotLoaded 
+    | Loaded { buffer :: AudioBuffer } 
+    | PlayingAudio { 
         buffer :: AudioBuffer, 
         source :: AudioGraph, 
         playStart :: AudioTime,
@@ -39,23 +39,28 @@ data AudioState =
         currentTime :: AudioTime 
     }
 
-data Mode = RepeatOff | RepeatOne | RepeatAll | Random
+data Mode 
+    = RepeatOff 
+    | RepeatOne 
+    | RepeatAll 
+    | Random
 
-data Query a = ShowOpenDialog a
-             | Open FilePath a
-             | Play a
-             | Pause a 
-             | Stop a
-             | Update a
-             | Minimize a
-             | Move Int a 
-             | Close a
-             | OpenDevTools a
-             | SetMode Mode a
-             | SetMute Boolean a
-             | SetVolume Number a
-             | SetPosition Number a 
-             | End a
+data Query a 
+    = ShowOpenDialog a
+    | Open FilePath a
+    | Play a
+    | Pause a 
+    | Stop a
+    | Update a
+    | Minimize a
+    | Move Int a 
+    | Close a
+    | OpenDevTools a
+    | SetMode Mode a
+    | SetMute Boolean a
+    | SetVolume Number a
+    | SetPosition Number a 
+    | End a
 
 type Input = AudioContext
 
