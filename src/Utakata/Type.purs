@@ -1,19 +1,20 @@
 module Utakata.Type where
 
+import Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
 import Control.Monad.Eff.Console (CONSOLE)
+import Control.Monad.Eff.Random (RANDOM)
+import Data.Foreign.Class (class Decode, class Encode)
+import Data.Foreign.Generic (defaultOptions, genericDecode, genericEncode)
 import Data.Foreign.NullOrUndefined (NullOrUndefined)
+import Data.Functor (class Functor)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe)
 import Data.Show (class Show)
 import Data.Void (Void)
-import Data.Functor (class Functor)
 import Halogen.Aff.Effects (HalogenEffects)
 import Node.FS.Aff (FS)
 import Node.Path (FilePath)
-import Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
-import LocalStorage (STORAGE)
-import Control.Monad.Eff.Random (RANDOM)
 
 type State = {
     filePath :: Maybe FilePath,
@@ -69,7 +70,6 @@ type Output = Void
 type Effects eff = HalogenEffects (
     fs :: FS, 
     console :: CONSOLE,
-    storage :: STORAGE "Utakata.Storage" Storage, 
     random :: RANDOM
         | eff)
 
@@ -80,6 +80,12 @@ newtype Storage = Storage {
 }
 
 derive instance genericStorage :: Generic Storage _
+
+instance encodeStorage :: Encode Storage where 
+    encode = genericEncode defaultOptions { unwrapSingleConstructors = true }
+
+instance decodeStorage :: Decode Storage where 
+    decode = genericDecode defaultOptions { unwrapSingleConstructors = true }
 
 derive instance genericMode :: Generic Mode _ 
 
@@ -92,3 +98,8 @@ instance showQuery :: (Show a) => Show (Query a) where
     show = genericShow
 
 derive instance functorQuery :: Functor Query 
+
+
+
+
+

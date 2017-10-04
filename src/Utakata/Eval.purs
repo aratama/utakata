@@ -30,7 +30,7 @@ import Node.Path (basename, dirname, extname, resolve)
 import Prelude (mod, ($), (*), (/=), (<$>), (<>), (==), const, unit)
 import Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
 import Electron (close, minimize, showOpenDialog, openDevTools)
-import LocalStorage (saveStorage')
+import LocalStorage (saveStorage)
 import Utakata.Type (AudioState(..), Effects, Mode(..), Output, Query(..), State, Storage(Storage))
 
 
@@ -157,16 +157,7 @@ eval query = do
             pure next 
 
         Pause next -> do 
-            modify \s -> s { playing = false }
-            state <- get 
-            case state.audio of 
-                PlayingAudio { buffer, source } -> do 
-                    modify _ { 
-                        audio = Loaded { buffer }
-                    }    
-                    liftEff $ log $ "pause-position: " <> show state.position
-                    liftEff $ stop source
-                _ -> pure unit
+            stopAutio
             pure next
 
         Stop next -> do 
@@ -192,10 +183,10 @@ eval query = do
             pure next
 
         Close next -> do 
+            stopAutio
             saveOptions
             liftEff close 
             pure next 
-
 
         OpenDevTools next -> do 
             liftEff openDevTools
@@ -233,7 +224,7 @@ eval query = do
     where 
         saveOptions = do 
             state <- get 
-            liftEff $ saveStorage' $ Storage {
+            liftEff $ saveStorage $ Storage {
                 filePath: NullOrUndefined state.filePath,
                 mode: show state.mode,
                 volume: state.volume
@@ -260,6 +251,18 @@ eval query = do
                     currentTime: startTime
                 }
             }
+
+        stopAutio = do
+            modify \s -> s { playing = false }
+            state <- get 
+            case state.audio of 
+                PlayingAudio { buffer, source } -> do 
+                    modify _ { 
+                        audio = Loaded { buffer }
+                    }    
+                    liftEff $ log $ "pause-position: " <> show state.position
+                    liftEff $ stop source
+                _ -> pure unit
 
         shuffle xs = do 
             i <- randomInt 0 (length xs - 1)
