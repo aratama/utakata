@@ -2,7 +2,7 @@ module Utakata.Eval (eval) where
 
 import Control.Applicative (pure, when)
 import Control.Bind (bind, discard)
-import Control.Monad.Aff (Aff, attempt)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.Class (liftAff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Console (log, logShow)
@@ -14,11 +14,11 @@ import Data.CommutativeRing ((+))
 import Data.EuclideanRing ((-))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
-import Data.Either (Either(Left, Right))
+
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
 import Data.Traversable (for)
-import Data.Unit (unit)
+
 import Halogen.Component (ComponentDSL)
 import Halogen.Query (gets)
 import Halogen.Query.EventSource (SubscribeStatus(..), eventSource)

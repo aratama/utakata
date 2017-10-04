@@ -7,7 +7,7 @@ Simple audio player app. It's an experimental, demonstrational and slightly prac
 ### build
 
 ```
-yarn install
+npm install
 bower update
-yarn run electron
+npm run electron
 ```
