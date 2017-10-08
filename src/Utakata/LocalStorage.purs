@@ -1,4 +1,4 @@
-module LocalStorage (loadStorage, saveStorage) where 
+module Utakata.LocalStorage (loadStorage, saveStorage) where 
 
 import Control.Monad.Eff (Eff, kind Effect)
 import DOM (DOM)
@@ -24,10 +24,3 @@ loadStorage = do
 
 saveStorage :: forall key a eff. Encode a => a -> Eff (dom :: DOM | eff) Unit
 saveStorage a = window >>= localStorage >>= setItem storageKey (encodeJSON a)
-
-
-
-
-
-
-

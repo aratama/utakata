@@ -1,5 +1,6 @@
 module Utakata.Eval (eval) where
 
+import Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
 import Control.Applicative (pure, when)
 import Control.Bind (bind, discard)
 import Control.Monad.Aff (Aff)
@@ -14,11 +15,10 @@ import Data.CommutativeRing ((+))
 import Data.EuclideanRing ((-))
 import Data.Foreign.NullOrUndefined (NullOrUndefined(..))
 import Data.Maybe (Maybe(Just, Nothing), fromMaybe)
-
 import Data.NaturalTransformation (type (~>))
 import Data.Show (show)
 import Data.Traversable (for)
-
+import Electron (close, minimize, showOpenDialog, openDevTools)
 import Halogen.Component (ComponentDSL)
 import Halogen.Query (gets)
 import Halogen.Query.EventSource (SubscribeStatus(..), eventSource)
@@ -28,11 +28,8 @@ import Node.FS.Stats (isFile)
 import Node.FS.Sync (stat)
 import Node.Path (basename, dirname, extname, resolve)
 import Prelude (mod, ($), (*), (/=), (<$>), (<>), (==), const, unit)
-import Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
-import Electron (close, minimize, showOpenDialog, openDevTools)
-import LocalStorage (saveStorage)
+import Utakata.LocalStorage (saveStorage)
 import Utakata.Type (AudioState(..), Effects, Mode(..), Output, Query(..), State, Storage(Storage))
-
 
 eval :: forall eff. Query ~> ComponentDSL State Query Output (Aff (Effects eff))
 eval query = do 

@@ -23,7 +23,7 @@ import Halogen.VDom.Driver (runUI)
 import Prelude (unit, ($))
 import Audio (createAudioContext)
 import Utakata.Eval (eval)
-import LocalStorage (loadStorage)
+import Utakata.LocalStorage (loadStorage)
 import Utakata.Render (render)
 import Utakata.Type (AudioState(..), Effects, Input, Mode(..), Output, Query(Update, Open), Storage(Storage))
 
