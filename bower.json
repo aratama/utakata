@@ -15,10 +15,10 @@
     "tests"
   ],
   "dependencies": {
-    "purescript-halogen": "^2.3.0",
-    "purescript-node-fs-aff": "^4.0.0",
-    "purescript-foreign-generic": "^5.0.0",
-    "purescript-formatters": "^2.1.0",
-    "purescript-random": "^3.0.0"
+    "purescript-halogen": "3.0.1",
+    "purescript-node-fs-aff": "5.0.0",
+    "purescript-foreign-generic": "5.0.0",
+    "purescript-formatters": "3.0.0",
+    "purescript-random": "3.0.0"
   }
 }

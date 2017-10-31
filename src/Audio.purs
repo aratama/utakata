@@ -3,7 +3,8 @@ module Audio (
     createAudioContext, loadAudio, play, stop, setGain, getDuration, addEndEventListener, removeEndEventListener, currentTime
 ) where 
 
-import Control.Monad.Aff (Aff, makeAff)
+import AffUtil (makeAffWithNonCanceler)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.AVar (AVAR)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (Error)
@@ -39,9 +40,12 @@ foreign import setGain :: forall eff. Number -> AudioGraph -> Eff (dom :: DOM | 
 foreign import loadAudioEff :: forall eff. String -> AudioContext -> (Error -> Eff (dom :: DOM | eff) Unit) -> (AudioBuffer -> Eff (dom :: DOM | eff) Unit) -> Eff (dom :: DOM | eff) Unit
 
 loadAudio :: forall eff. FilePath -> AudioContext -> Aff (dom :: DOM | eff) AudioBuffer
-loadAudio path context = makeAff (loadAudioEff path context)
+loadAudio path context = makeAffWithNonCanceler (loadAudioEff path context)
 
 foreign import currentTime :: forall eff. AudioContext -> Eff (dom :: DOM | eff) Number
 
 foreign import getDuration :: AudioBuffer -> Number
+
+
+
 

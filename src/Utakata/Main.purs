@@ -1,8 +1,10 @@
 module Utakata.Main (main) where
 
+import AffUtil (makeAffWithNonCanceler)
+import Audio (createAudioContext)
 import Control.Bind (bind, discard)
 import Control.Monad (pure, void)
-import Control.Monad.Aff (Aff, makeAff)
+import Control.Monad.Aff (Aff)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Except.Trans (runExceptT)
@@ -21,7 +23,6 @@ import Halogen.HTML (HTML)
 import Halogen.Query (action)
 import Halogen.VDom.Driver (runUI)
 import Prelude (unit, ($))
-import Audio (createAudioContext)
 import Utakata.Eval (eval)
 import Utakata.LocalStorage (loadStorage)
 import Utakata.Render (render)
@@ -74,7 +75,7 @@ main = runHalogenAff do
 
     win <- liftEff window
     _ <- tailRecM (\_ -> do
-        makeAff \_ resolve -> void do 
+        makeAffWithNonCanceler \_ resolve -> void do 
             requestAnimationFrame (do 
                 runHalogenAff $ io.query (action Update)
                 resolve unit
@@ -82,6 +83,9 @@ main = runHalogenAff do
         pure (Loop unit)
     ) unit
     pure unit 
+
+
+
 
 
 
