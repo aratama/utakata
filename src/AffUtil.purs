@@ -4,19 +4,9 @@ import Control.Monad.Aff (Aff, makeAff, nonCanceler)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (Error)
 import Data.Either (Either(..))
-import Prelude (Unit, bind, pure)
+import Prelude (Unit, discard, pure, (<<<))
 
 makeAffWithNonCanceler :: forall a eff. ((Error -> Eff eff Unit) -> (a -> Eff eff Unit) -> Eff eff Unit) -> Aff eff a
 makeAffWithNonCanceler raw = makeAff \callback -> do 
-    _ <- raw (\err -> callback (Left err) ) (\value -> callback (Right value) )
+    raw (callback <<< Left) (callback <<< Right)
     pure nonCanceler
-
-
-
-
-
-
-
-
-
-

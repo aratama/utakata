@@ -15,12 +15,12 @@ import Prelude (bind, pure, (>>=))
 storageKey :: String
 storageKey = "Utakata.Storage"
 
-loadStorage :: forall key a eff. Decode a => Eff (dom :: DOM | eff) (F a)
+loadStorage :: forall a eff. Decode a => Eff (dom :: DOM | eff) (F a)
 loadStorage = do 
     str :: Maybe String <- window >>= localStorage >>= getItem storageKey
     pure case str of 
         Nothing -> fail (ForeignError "No option data in the local storage.")
-        Just str -> decodeJSON str
+        Just str' -> decodeJSON str'
 
-saveStorage :: forall key a eff. Encode a => a -> Eff (dom :: DOM | eff) Unit
+saveStorage :: forall a eff. Encode a => a -> Eff (dom :: DOM | eff) Unit
 saveStorage a = window >>= localStorage >>= setItem storageKey (encodeJSON a)
