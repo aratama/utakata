@@ -34,15 +34,21 @@ exports.play = function(audioBuffer){
     return function(offset){
         return function(context){
             return function(){
+                var fade = context.createGain();
+                fade.connect(context.destination);
+
                 var gain = context.createGain();
-                gain.connect(context.destination);
+                gain.connect(fade);
 
                 var source = context.createBufferSource();
                 source.buffer = audioBuffer;        
                 source.connect(gain); 
                 source.start(0, offset);
 
-                return { source: source, gain: gain };
+                fade.gain.value = 0;
+                fade.gain.linearRampToValueAtTime(1, context.currentTime + 0.05);
+
+                return { context: context, source: source, gain: gain, fade: fade };
             };
         };
     };
@@ -66,7 +72,10 @@ exports.removeEndEventListener = function(source){
 
 exports.stop = function(graph){
     return function(){
-        graph.source.stop(0);
+        graph.fade.gain.linearRampToValueAtTime(0, graph.context.currentTime + 0.05);
+        setTimeout(function(){
+            graph.source.stop(0);
+        }, 50);
     };
 };
 
