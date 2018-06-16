@@ -4,12 +4,10 @@ module Audio (
 ) where 
 
 import AffUtil (makeAffWithNonCanceler)
-import Control.Monad.Aff (Aff)
-import Control.Monad.Aff.AVar (AVAR)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Exception (Error)
-import DOM (DOM)
-import DOM.Event.Event (Event)
+import Effect.Aff (Aff)
+import Effect (Effect)
+import Effect.Exception (Error)
+import Web.Event.Event (Event)
 import Data.Unit (Unit)
 import Node.Path (FilePath)
 
@@ -25,24 +23,24 @@ foreign import data GainNode :: Type
 
 type AudioGraph = { source :: AudioBufferSource, gain :: GainNode }
 
-foreign import createAudioContext :: forall eff. Eff (dom :: DOM | eff) AudioContext
+foreign import createAudioContext :: Effect AudioContext
 
-foreign import play :: forall eff. AudioBuffer -> AudioTime -> AudioContext -> Eff (dom :: DOM | eff) AudioGraph
+foreign import play :: AudioBuffer -> AudioTime -> AudioContext -> Effect AudioGraph
 
-foreign import addEndEventListener :: forall eff. AudioBufferSource -> (Event -> Eff (dom :: DOM, avar :: AVAR | eff) Unit) -> Eff (dom :: DOM, avar :: AVAR | eff) Unit
+foreign import addEndEventListener :: AudioBufferSource -> (Event -> Effect Unit) -> Effect Unit
 
-foreign import removeEndEventListener :: forall eff. AudioBufferSource -> Eff (dom :: DOM, avar :: AVAR | eff) Unit
+foreign import removeEndEventListener :: AudioBufferSource -> Effect Unit
 
-foreign import stop :: forall eff. AudioGraph -> Eff (dom :: DOM | eff) Unit
+foreign import stop :: AudioGraph -> Effect Unit
 
-foreign import setGain :: forall eff. Number -> AudioGraph -> Eff (dom :: DOM | eff) Unit
+foreign import setGain :: Number -> AudioGraph -> Effect Unit
  
-foreign import loadAudioEff :: forall eff. String -> AudioContext -> (Error -> Eff (dom :: DOM | eff) Unit) -> (AudioBuffer -> Eff (dom :: DOM | eff) Unit) -> Eff (dom :: DOM | eff) Unit
+foreign import loadAudioEff :: String -> AudioContext -> (Error -> Effect Unit) -> (AudioBuffer -> Effect Unit) -> Effect Unit
 
-loadAudio :: forall eff. FilePath -> AudioContext -> Aff (dom :: DOM | eff) AudioBuffer
+loadAudio :: FilePath -> AudioContext -> Aff AudioBuffer
 loadAudio path context = makeAffWithNonCanceler (loadAudioEff path context)
 
-foreign import currentTime :: forall eff. AudioContext -> Eff (dom :: DOM | eff) Number
+foreign import currentTime :: AudioContext -> Effect Number
 
 foreign import getDuration :: AudioBuffer -> Number
 

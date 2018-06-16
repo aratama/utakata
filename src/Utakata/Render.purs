@@ -1,13 +1,12 @@
 module Utakata.Render (render) where
 
-import DOM.Event.KeyboardEvent (key)
+import Audio (getDuration)
 import DOM.HTML.Indexed.StepValue (StepValue(..))
 import Data.Array (mapWithIndex)
 import Data.CommutativeRing ((+))
 import Data.Either (Either(..))
 import Data.EuclideanRing (mod)
-import Data.Formatter.Number (format, Formatter(..))
-import Data.Int (floor, toNumber)
+import Data.Int (floor)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Monoid ((<>))
 import Data.Show (show)
@@ -22,10 +21,10 @@ import Halogen.HTML.Elements (button, div, i, input, option, select, span)
 import Halogen.HTML.Events (input_, onClick, onKeyDown, onValueChange, onValueInput)
 import Halogen.HTML.Properties (InputType(InputRange), class_, max, min, selected, step, type_, value)
 import Node.Path (FilePath, basename, basenameWithoutExt, dirname, extname)
-import Prelude (negate, not, ($), (<$>), (<<<), (==))
 import Prelude (div) as Prelude
-import Audio (getDuration)
+import Prelude (negate, not, ($), (<), (<$>), (==))
 import Utakata.Type (AudioState(..), Mode(..), Query(..), State)
+import Web.UIEvent.KeyboardEvent (key)
 
 
 icon :: forall p i. String -> HTML p i
@@ -64,7 +63,7 @@ render state = div [
 
         span [class_ (ClassName "position")] [
             let seconds = floor $ state.position in 
-                text $ show (Prelude.div seconds 60) <> ":" <> formatInt (mod seconds 60)],      
+                text $ formatInt (Prelude.div seconds 60) <> ":" <> formatInt (mod seconds 60)],      
         div [class_ (ClassName "spacer")] [],        
         
         button [ onClick (input_ (Move (negate 1))) ] [icon "backward"],
@@ -115,11 +114,4 @@ render state = div [
     ]
 
     formatInt :: Int -> String
-    formatInt = format (Formatter {
-        comma: false,
-        before: 2, 
-        after: 0, 
-        abbreviations: false, 
-        sign: false
-    }) <<< toNumber
-
+    formatInt n = if n < 10 then "0" <> show n else show n

@@ -1,19 +1,14 @@
 module Utakata.Type where
 
 import Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
-import Control.Monad.Eff.Console (CONSOLE)
-import Control.Monad.Eff.Random (RANDOM)
-import Data.Foreign.Class (class Decode, class Encode)
-import Data.Foreign.Generic (defaultOptions, genericDecode, genericEncode)
-import Data.Foreign.NullOrUndefined (NullOrUndefined)
+import Foreign.Class (class Decode, class Encode)
+import Foreign.Generic (defaultOptions, genericDecode, genericEncode)
 import Data.Functor (class Functor)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe)
 import Data.Show (class Show)
 import Data.Void (Void)
-import Halogen.Aff.Effects (HalogenEffects)
-import Node.FS.Aff (FS)
 import Node.Path (FilePath)
 
 type State = {
@@ -67,14 +62,8 @@ type Input = AudioContext
 
 type Output = Void
 
-type Effects eff = HalogenEffects (
-    fs :: FS, 
-    console :: CONSOLE,
-    random :: RANDOM
-        | eff)
-
 newtype Storage = Storage {
-    filePath :: NullOrUndefined FilePath,
+    filePath :: Maybe FilePath,
     mode :: String, 
     volume :: Number
 }
