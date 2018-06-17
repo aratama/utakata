@@ -14,13 +14,15 @@
     "compile": "pulp build --to public/index.js",
     "electron": "npm run compile && electron public",
     "prepack": "npm run compile",
-    "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite --icon=./res/icon.ico",
+    "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite",
     "postpack": "cd ./utakata-win32-x64/ && utakata",
-    "pack-all": "electron-packager public utakata --all --electron-version=1.4.16 --overwrite --icon=./res/icon.ico"
+    "pack-all": "electron-packager public utakata --all --electron-version=1.4.16 --overwrite"
   },
   "author": "",
   "license": "MIT",
-  "devDependencies": {},
+  "devDependencies": {
+    "electron-packager": "^12.1.0"
+  },
   "dependencies": {
     "electron": "^1.8.7",
     "hoek": "^5.0.3"
