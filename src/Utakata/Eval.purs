@@ -1,6 +1,7 @@
 module Utakata.Eval (eval) where
 
-import Audio (loadAudio, play, stop, setGain, addEndEventListener, removeEndEventListener, currentTime)
+import Audio.WebAudio.GainNode (setGain)
+import Audio.WebAudio.Extra (loadAudio, play, stop, addEndEventListener, removeEndEventListener, currentTime)
 import Control.Applicative (pure, void, when)
 import Control.Bind (bind, discard)
 import Control.Monad.State (modify)
@@ -245,13 +246,13 @@ eval query = do
         updateGain = do 
             state <- get 
             case state.audio of
-                PlayingAudio { source } -> liftEffect $ setGain (if state.muted then 0.0 else state.volume * state.volume) source
+                PlayingAudio { source } -> liftEffect $ setGain (if state.muted then 0.0 else state.volume * state.volume) source.gain
                 _ -> pure unit 
 
         playAudio buffer = void do
             state <- get 
             graph <- liftEffect $ play buffer state.position state.context 
-            liftEffect $ setGain (state.volume * state.volume) graph
+            liftEffect $ setGain (state.volume * state.volume) graph.gain
             startTime <- liftEffect $ currentTime state.context
             subscribe $ eventSource (addEndEventListener graph.source) (\e -> Just (End Done))
             modify _ { 

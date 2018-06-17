@@ -22,6 +22,7 @@
     "purescript-generics-rep": "^6.0.0",
     "purescript-foreign-generic": "^7.0.0",
     "purescript-node-fs": "^5.0.0",
-    "purescript-node-fs-aff": "^6.0.0"
+    "purescript-node-fs-aff": "^6.0.0",
+    "purescript-webaudio": "adkelley/purescript-webaudio#^0.1.2"
   }
 }

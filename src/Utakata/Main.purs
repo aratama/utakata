@@ -1,21 +1,19 @@
 module Utakata.Main (main) where
 
 import AffUtil (makeAffWithNonCanceler)
-import Audio (createAudioContext)
+import Audio.WebAudio.BaseAudioContext (newAudioContext)
 import Control.Bind (bind, discard)
 import Control.Monad (pure, void)
-import Effect.Aff (Aff)
-import Effect (Effect)
-import Effect.Class (liftEffect)
 import Control.Monad.Except.Trans (runExceptT)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
-import Web.HTML (window)
-import Web.HTML.Window (requestAnimationFrame)
 import Data.Either (Either(Right, Left))
 import Data.Identity (Identity(..))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (unwrap)
 import Data.Unit (Unit)
+import Effect (Effect)
+import Effect.Aff (Aff)
+import Effect.Class (liftEffect)
 import Halogen.Aff.Util (runHalogenAff, awaitBody)
 import Halogen.Component (Component, component)
 import Halogen.HTML (HTML)
@@ -26,6 +24,8 @@ import Utakata.Eval (eval)
 import Utakata.LocalStorage (loadStorage)
 import Utakata.Render (render)
 import Utakata.Type (AudioState(..), Input, Mode(..), Output, Query(Update, Open), Storage(Storage))
+import Web.HTML (window)
+import Web.HTML.Window (requestAnimationFrame)
 
 ui :: Storage -> Component HTML Query Input Output Aff
 ui (Storage options) = component {
@@ -53,7 +53,7 @@ ui (Storage options) = component {
 main :: Effect Unit
 main = runHalogenAff do
     body <- awaitBody
-    context <- liftEffect createAudioContext
+    context <- liftEffect newAudioContext
     options <- liftEffect loadStorage
 
     let ops = case unwrap (runExceptT options) of 

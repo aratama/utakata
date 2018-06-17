@@ -1,8 +1,3 @@
-exports.createAudioContext = function(){
-    window.AudioContext = window.AudioContext||window.webkitAudioContext;
-    return new AudioContext();
-};
-
 exports.loadAudioEff = function(path){
     return function(context){
         return function(reject){
@@ -82,14 +77,6 @@ exports.stop = function(graph){
 exports.currentTime = function(context){
     return function(){
         return context.currentTime;
-    };
-};
-
-exports.setGain = function(value){
-    return function(graph){
-        return function(){
-            graph.gain.gain.value = value;
-        };
     };
 };
 

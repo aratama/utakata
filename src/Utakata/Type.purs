@@ -1,6 +1,6 @@
 module Utakata.Type where
 
-import Audio (AudioBuffer, AudioContext, AudioGraph, AudioTime)
+import Audio.WebAudio.Extra (AudioBuffer, AudioContext, AudioGraph, AudioTime)
 import Foreign.Class (class Decode, class Encode)
 import Foreign.Generic (defaultOptions, genericDecode, genericEncode)
 import Data.Functor (class Functor)

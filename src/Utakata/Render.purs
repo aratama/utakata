@@ -1,6 +1,6 @@
 module Utakata.Render (render) where
 
-import Audio (getDuration)
+import Audio.WebAudio.Extra (getDuration)
 import DOM.HTML.Indexed.StepValue (StepValue(..))
 import Data.Array (mapWithIndex)
 import Data.CommutativeRing ((+))
