@@ -12,6 +12,7 @@
     "clean-builds": "rimraf utakata-win32-x64 utakata-win32-ia32 utakata-linux-x64 utakata-linux-ia32 utakata-linux-armv7l",
     "clean-all": "npm run clean && rimraf bower_components node_modules public/node_modules && npm run clean-builds",
     "compile": "pulp build --to public/index.js",
+    "build": "npm run compile",
     "electron": "npm run compile && electron public",
     "prepack": "npm run compile",
     "pack": "electron-packager public utakata --platform=\"win32\" --arch=x64 --electron-version=1.4.16 --overwrite",
