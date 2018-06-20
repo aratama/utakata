@@ -10,7 +10,7 @@ cache:
     - output
 
 before_install:
-  - npm -g install bower
+  - npm -g install bower purescript pulp
 
 install:
   - npm install

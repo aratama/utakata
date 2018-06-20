@@ -8,7 +8,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
 
   # install modules
-  - npm -g install bower
+  - npm -g install bower purescript pulp
   - npm install
   - bower update
   - npm run build
